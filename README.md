@@ -37,13 +37,15 @@ Below are the developer environment used for this module on Azure. All the obser
 | *Standard_D4_V5* | 4 | 16GB | ICELAKE
 
 ### Packages
-| **Package**                | **Stock Python**                | **Intel Python**
-| :---                       | :---                            | :---
-| python                     | python=3.9.7=hdb3f193_2         | python=3.9.7=h718aa4a_4
-| pytorch                    | pytorch=1.8.0                   | pytorch=1.8.0=py39_0
-| IPEX                       | *NA*                            | intel-extension-for-pytorch=1.8.0=py39_0
-| neural-compressor          | neural-compressor==1.12         | *NA*
-| openVINO                   | OpenVINO™ Toolkit- 2021.4.2     | *NA*
+| **Package**         | **Stock Python**            | **Intel Python**                          | **OpenVINO**         
+| :---                | :---                        | :---                                      | :---
+| python              | python=3.9.7=hdb3f193_2     | python=3.9.7=h718aa4a_4                   | python=3.9.7
+| pytorch             | pytorch=1.8.0               | pytorch=1.8.0=py39_0                      | *NA*
+| IPEX                | *NA*                        | intel-extension-for-pytorch=1.8.0=py39_0  | *NA*
+| neural-compressor   | neural-compressor==1.12     | *NA*                                      | *NA*
+| OpenVINO™ Toolkit   | *NA*                        | *NA*  | openvino-dev[pytorch,onnx]==2022.1.0<br>openvino==2022.1.0
+                             
+
 
 ### Dataset
 | **Use case** | Anomaly detection on product inspection
@@ -246,6 +248,7 @@ python pytorch_evaluation.py -d ../data -m ./{trained_model.h5} -b 1 -i 1
 ```
 
 > By using different batchsize one can observe the gain obtained using Intel® Extension for PyTorch
+  
 
 ### 5. Quantize trained models using Intel® Neural Compressor
 Intel® Neural Compressor is used to quantize the FP32 Model to the INT8 Model. Optimzied model is used here for evaluating and timing Analysis.
@@ -305,43 +308,40 @@ optional arguments:
 python neural_compressor_inference.py -d ../data/ -fp32 ../{trained_model.h5}  -int8 ./output -b 1
 ```
 > Use `-b` to test with different batch size (e.g. `-b 10`)
+  
 
 ### 6. Quantize trained models using Intel® Distribution of OpenVINO
-When it comes to the deployment of this model on Edge devices, with less computing and memory resources, we further need to explore options for quantizing and compressing the model which brings out the same level of accuracy and efficient utilization of underlying computing resources. Intel® Distribution of OpenVINO™ Toolkit facilitates the optimization of a deep learning model from a framework and deployment using an inference engine on such computing platforms based on Intel hardware accelerators. Below section covers the steps to use this toolkit for the model quantization and measure its performance.
-
-#### Setting up the environment for Intel® Distribution of OpenVINO
-*Toolkit Installation*
-Intel® Distribution of OpenVINO™ Toolkit used here is **2021.4.2** on Ubuntu 20.04 by following the installation procedure at
-https://docs.openvino.ai/latest/openvino_docs_install_guides_installing_openvino_linux.html#install-openvino
-
-*POT (Post Optimization Toolkit) Installation*
-https://docs.openvino.ai/2021.4/pot_InstallationGuide.html#doxid-pot-installation-guide
+When it comes to the deployment of this model on Edge devices, with less computing and memory resources, we further need to explore options for quantizing and compressing the model which brings out the same level of accuracy and efficient utilization of underlying computing resources. Intel® Distribution of OpenVINO™ Toolkit facilitates the optimization of a deep learning model from a framework and deployment using an inference engine on such computing platforms based on Intel hardware accelerators. Below section covers the steps to use this toolkit for the model quantization and measure its performance.  
+  
+**Setting up the environment for OpenVINO**<br>Follow the below conda installation commands to setup the OpenVINO environment. 
+```sh
+conda env create -f env/openvino_pot/openvino.yml
+```
+*Activate OpenVINO environment*
+Use the following command to activate the environment that was created:
+```sh
+conda activate openvino
+```
 
 **OpenVINO Intermediate Representation (IR) conversion** <br>
 Below are the steps to onvert ONNX model representation to OpenVINO IR using OpenVINO model converter.
 
-*Pre-requisites*
-The OpenVINO running environment has been installed as the standard installation procedure.
-
-ONNX model should be generated using `training.py` without enabling hyperparameter tuning.
-
-By default as per the openvino documentation installation location is as follows
-  1. For root or administrator: `/opt/intel/openvino_<version>/`
-  2. For regular users: `/home/<USER>/intel/openvino_<version>/`
+*Pre-requisites*  
+- ONNX model should be generated using `training.py` without enabling hyperparameter tuning.
 
 ```sh
-source /opt/intel/openvino_2021/bin/setupvars.sh
-python /opt/intel/openvino_2021/deployment_tools/model_optimizer/mo_onnx.py --input_model <trained pill onnx model> --output_dir <output directory>
+mo --input_model <trained pill onnx model> --output_dir <output directory>
 ```
 
-> The above step will generate `<model-name>.bin` and `<model-name.xml` as output which can be used with OpenVINO inference application. Default precision is FP32.
+> The above step will generate `<model-name>.bin` and `<model-name>.xml` as output which can be used with OpenVINO inference application. Default precision is FP32.
+  
 
 **Running inference using OpenVINO**<br>Command to perform inference using OpenVINO. The model need to be converted to IR format as per the section OpenVINO IR conversion. 
 
 > *Note*<br>This module is based on the hello_classification python module from the OpenVINO package.
 
 ```
-usage: openvino_inference.py [-h] -m MODEL -i INPUT [-l EXTENSION] [-c CONFIG] [-d DEVICE] [--labels LABELS] [-nt NUMBER_TOP] [--outputname OUTPUTNAME]
+usage: python src/intel_openvino/openvino_inference.py -m MODEL -i INPUT [-d DEVICE] [--labels LABELS] [-nt NUMBER_TOP]
 
 Options:
   -h, --help            Show this help message and exit.
@@ -349,17 +349,11 @@ Options:
                         Required. Path to an .xml or .onnx file with a trained model.
   -i INPUT, --input INPUT
                         Required. Path to an image file(s).
-  -l EXTENSION, --extension EXTENSION
-                        Optional. Required by the CPU Plugin for executing the custom operation on a CPU. Absolute path to a shared library with the kernels implementations.
-  -c CONFIG, --config CONFIG
-                        Optional. Required by GPU or VPU Plugins for the custom operation kernel. Absolute path to operation description file (.xml).
   -d DEVICE, --device DEVICE
                         Optional. Specify the target device to infer on; CPU, GPU, MYRIAD, HDDL or HETERO: is acceptable. The sample will look for a suitable plugin for device specified. Default value is CPU.
   --labels LABELS       Optional. Path to a labels mapping file.
   -nt NUMBER_TOP, --number_top NUMBER_TOP
                         Optional. Number of top results.
-  --outputname OUTPUTNAME
-                        Optional. Output blob name for the classification.
 ```
 *Sample output*
 ```
@@ -383,25 +377,20 @@ Post-training Optimization Tool (POT) is designed to accelerate the inference of
 *High level flow for the quantization model conversion and benchmarking*
 ![image](assets/openvino_pot_flow.png)
 
-*Environment Setup*
-- Python 3.6 or higher
-- Intel® Distribution of OpenVINO™ Toolkit v2021.4.2
-- Post-Training Optimization Tool
+**Performance Benchmarking of full precision (FP32) Model**<br>
 
-**Performance Benchmarking of full precision (FP32) Model**<br>Use the below command to run the benchmark tool for the ONNX model generated using this codebase for the pill anamoly detection. 
+> Activate OpenVINO environment before running  
+  
 
-> Assuming the Intel OpenVINO toolkit is installed and the POT Installation has been completed as per the OpenVINO guide.
-> NOTE: Running setupvars.sh is required only once
+Use the below command to run the benchmark tool for the ONNX model generated using this codebase for the pill anamoly detection. 
 
 ```sh
-source /opt/intel/openvino_2021/bin/setupvars.sh
-python3 /opt/intel/openvino_2021/deployment_tools/tools/benchmark_tool/benchmark_app.py -m pill_intel_model.onnx
+benchmark_app -m pill_intel_model.onnx
 ```
 
 Use the below command to run the benchmark tool for the OpenVINO IR model generated using this codebase for the pill anamoly detection. 
 ```sh
-source /opt/intel/openvino_2021/bin/setupvars.sh
-python3 /opt/intel/openvino_2021/deployment_tools/tools/benchmark_tool/benchmark_app.py -m pill_intel_model.xml -api async -niter 120 -nireq 1 -b 1<batch_size> -nstreams 1 -nthreads <number_of_cpu_cores>
+benchmark_app -m pill_intel_model.xml -api async -niter 120 -nireq 1 -b <batch_size> -nstreams 1 -nthreads <number_of_cpu_cores>
 ```
 
 #### Model Quantization
@@ -426,11 +415,10 @@ python3 /opt/intel/openvino_2021/deployment_tools/tools/benchmark_tool/benchmark
 *DefaultQuantization* : `env/openvino_pot/pill_intel_model_int8.json`
 *AccuracyAwareQuantization* : `env/openvino_pot/pill_intel_model_int8_acc.json`
 
-> **Note**<br>These json files contains paths of FPIR model
+> **Note**<br>These json files contains paths of FP32 IR model
 
 Use the below command to quantize the model as per the requirement. 
 ```sh
-source /opt/intel/openvino_2021/bin/setupvars.sh
 pot -c env/openvino_pot/pill_intel_model_int8.json -e
 ```
 
@@ -440,8 +428,7 @@ pot -c env/openvino_pot/pill_intel_model_int8.json -e
 Use the below command to run the benchmark tool for the Quantized OpenVINO IR model generated using the steps given in the previous section.
 
 ```sh
-source /opt/intel/openvino_2021/bin/setupvars.sh
-python3 /opt/intel/openvino_2021/deployment_tools/tools/benchmark_tool/benchmark_app.py -m results/<path_to_the_quantized_model/pill_intel_model.xml -api async -niter 120 -nireq 1 -b 1<batch_size> -nstreams 1 -nthreads <number_of_cpu_cores>
+benchmark_app -m results/<path_to_the_quantized_model/pill_intel_model.xml -api async -niter 120 -nireq 1 -b <batch_size> -nstreams 1 -nthreads <number_of_cpu_cores>
 ```
 
 ### 7. Observations
