@@ -85,8 +85,12 @@ def main():
         if image.shape[:-1] != (height, width):
             image = cv2.resize(image, (width, height))
 
+        # pre-process
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         # Change data layout from HWC to CHW
         image = image.transpose((2, 0, 1))
+        # normalize
+        image = image / 255.0
 
         input_data[i] = image
 
