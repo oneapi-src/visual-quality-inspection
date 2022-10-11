@@ -151,8 +151,7 @@ if __name__ == "__main__":
     class_weight = [1, 3] if NEG_CLASS == 1 else [3, 1]
     DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     if intel_flag:
-        import intel_pytorch_extension as ipex
-        DEVICE = ipex.DEVICE
+        import intel_extension_for_pytorch as ipex
 
     HEATMAP_THRESH = 0.7
     N_CV_FOLDS = 3
@@ -174,6 +173,7 @@ if __name__ == "__main__":
     class_weight = torch.tensor(class_weight).type(torch.FloatTensor).to(DEVICE)
     criterion = nn.CrossEntropyLoss(weight=class_weight)
     optimizer = optim.Adam(model.parameters(), lr=LR)
+    model, optimizer = ipex.optimize(model=model, optimizer=optimizer, dtype=torch.float32)
 
     # Training module
     start_time = time.time()
