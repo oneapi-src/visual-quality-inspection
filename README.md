@@ -354,6 +354,9 @@ Options:
   --labels LABELS       Optional. Path to a labels mapping file.
   -nt NUMBER_TOP, --number_top NUMBER_TOP
                         Optional. Number of top results.
+  --outputname OUTPUTNAME
+                        Optional. Output blob name for the classification. 
+                        For different versions of PyTorch, it may generate different output node name after training, please check the output node name in your model and pass it the this argument. Defaut value is "64".
 ```
 *Sample output*
 ```
