@@ -22,13 +22,10 @@ models:
           - type: crop
             size: 224
             use_pillow: True
-          - type: bgr_to_rgb
+          - type: normalization
+            std: 255
 
         metrics:
           - name: accuracy@top1
             type: accuracy
             top_k: 1
-
-          - name: accuracy@top5
-            type: accuracy
-            top_k: 5
