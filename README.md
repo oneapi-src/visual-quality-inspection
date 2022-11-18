@@ -478,7 +478,7 @@ The reference kits commands are linux based, in order to run this on Windows, go
 
 > **Note** If WSL is installed and not opening, goto Start ---> Turn Windows feature on or off and make sure Windows Subsystem for Linux is checked. Restart the system after enabling it for the changes to reflect.
 
-###Notices & Disclaimers
+## Notices & Disclaimers
 Performance varies by use, configuration, and other factors. Learn more on the [Performance Index site](https://edc.intel.com/content/www/us/en/products/performance/benchmarks/overview/). 
 Performance results are based on testing as of dates shown in configurations and may not reflect all publicly available updates.  See backup for configuration details.  No product or component can be absolutely secure. 
 Your costs and results may vary. 
