@@ -489,5 +489,3 @@ The reference kits commands are linux based, in order to run this on Windows, go
 
 > **Note** If WSL is installed and not opening, goto Start ---> Turn Windows feature on or off and make sure Windows Subsystem for Linux is checked. Restart the system after enabling it for the changes to reflect.
 
-****
-
