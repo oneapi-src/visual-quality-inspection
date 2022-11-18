@@ -16,7 +16,7 @@ In this example we highlight the difference of using deep learning, machine lear
 The time required for training the model, inference time and the accuracy of the model are captured for multiple runs on the stock version as well on those in Intel® oneAPI AI Analytics Toolkit. The average of these runs are considered and the comparison have been provided.
   
 ## Key Implementation Details
-This sample code is implemented for CPU using the Python language and Intel® Extension for PyTorch* v1.8.0 has been used in this code base. VGGNet, a classical convolutional neural network (CNN) architecture is being used for training. VGG was developed to increase the depth of such CNNs in order to increase the model performance and it is widely used in computer vision use cases. Tuning parameters has been introduced to the model in an optimization algorithm with different learning rate for checking how quickly the model is adapted to the problem in order to increase the model performance.
+This sample code is implemented for CPU using the Python language and Intel® Extension for PyTorch* v1.12.300 has been used in this code base. VGGNet, a classical convolutional neural network (CNN) architecture is being used for training. VGG was developed to increase the depth of such CNNs in order to increase the model performance and it is widely used in computer vision use cases. Tuning parameters has been introduced to the model in an optimization algorithm with different learning rate for checking how quickly the model is adapted to the problem in order to increase the model performance.
 
 ### **Use Case E2E flow**
 ![Use_case_flow](assets/quality_visual_inspection_e2e_flow.png)
@@ -51,12 +51,12 @@ Below are the developer environment used for this module on Azure. All the obser
 | :--- | :--: | :--: | :--:
 | *Standard_D4_V5* | 4 | 16GB | ICELAKE
 
-### Packages
+### Packagespytorch=1.12.0=py39_0
 | **Package**         | **Stock Python**            | **Intel Python**                          | **OpenVINO**         
 | :---                | :---                        | :---                                      | :---
 | python              | python=3.9.7=hdb3f193_2     | python=3.9.7=h718aa4a_4                   | python=3.9.7
-| pytorch             | pytorch=1.8.0               | pytorch=1.8.0=py39_0                      | *NA*
-| IPEX                | *NA*                        | intel-extension-for-pytorch=1.8.0=py39_0  | *NA*
+| pytorch             | pytorch=1.8.0               | pytorch=1.12.0=py39_0                      | *NA*
+| Intel® Extension for PyTorch                | *NA*                        | intel-extension-for-pytorch=1.12.300=py39_0 | *NA*
 | neural-compressor   | neural-compressor==1.12     | *NA*                                      | *NA*
 | OpenVINO™ Toolkit   | *NA*                        | *NA*  | openvino-dev[pytorch,onnx]==2022.1.0<br>openvino==2022.1.0
                              
@@ -91,17 +91,6 @@ Performed inferencing using the trained model with
 - Intel® Neural Compressor
 - Intel® Distribution of OpenVINO™ Toolkit
 
-#### Intel® Extension for PyTorch
-The below changes have been done to the stock PyTorch training code base to utilize the Intel® Extension for PyTorch* performance.
-One can enable the intel flag to incorporate below Intel Pytorch optimizations.
-```
-import intel_pytorch_extension as ipex
-...
-model = model.to(ipex.DEVICE)
-inputs = inputs.to(ipex.DEVICE)
-labels = labels.to(ipex.DEVICE)
-...
-```
 
 ## Usage and Instructions
 Below are the steps to reproduce the bechmarking results given in this repository
@@ -447,12 +436,12 @@ benchmark_app -m results/<path_to_the_quantized_model/pill_intel_model.xml -api 
 ```
 
 ### 7. Observations
-This section covers the prediction time comparison between Stock PyTorch 1.8.0 and Intel PyTorch Extension (IPEX) 1.8.0 for this model.
+This section covers the prediction time comparison between Stock PyTorch 1.8.0 and Intel PyTorch Extension 1.8.0 for this model.
 
 ![image](assets/pytorch_prediction_time.png)
 <br>**Key Takeaways**
-- Realtime prediction time speedup with IPEX 1.8.0 shows up to 2.22x against stock Pytorch 1.8.0 for the Pill anomaly detection model
-- Batch prediction time speedup with IPEX 1.8.0 shows from 1.04x to 1.38x against stock Pytorch 1.8.0 for the Pill anomaly detection model
+- Realtime prediction time speedup with Intel® Extension for PyTorch 1.8.0 shows up to 2.22x against stock Pytorch 1.8.0 for the Pill anomaly detection model
+- Batch prediction time speedup with Intel® Extension for PyTorch 1.8.0 shows from 1.04x to 1.38x against stock Pytorch 1.8.0 for the Pill anomaly detection model
 
 #### Intel Neural Compressor
 Below are the observations on the inference timing on the quantized model created using Intel® Neural Compressor(INC) on Azure Standard_D4_V5 instance.
@@ -462,7 +451,7 @@ Below are the observations on the inference timing on the quantized model create
 - Realtime prediction time speedup with Stock Pytorch 1.8.0 INC INT8 quantized Pill anomaly detection model shows up to 8.15x against Stock Pytorch 1.8.0 FP32 model
 - Batch prediction time speedup with Stock Pytorch 1.8.0 INC INT8 quantized Pill anomaly detection model shows from 3.18x  to 4.54x against Stock Pytorch 1.8.0 FP32 model
 
-> Gain obtained here is purely with Intel® Neural Compressor(INC) quantized model without any IPEX optimizations.<br>There is only 0.001% Accuracy drop observed post quantization of FP32 model in both phases.
+> Gain obtained here is purely with Intel® Neural Compressor(INC) quantized model without any Intel® Extension for PyTorch optimizations.<br>There is only 0.001% Accuracy drop observed post quantization of FP32 model in both phases.
 
 #### OpenVINO Post-Training Optimization Tool
 This section covers the benchmarking observations using the pre and post quantized model using OpenVINO Post-Training Optimization Tool .
@@ -489,3 +478,18 @@ The reference kits commands are linux based, in order to run this on Windows, go
 
 > **Note** If WSL is installed and not opening, goto Start ---> Turn Windows feature on or off and make sure Windows Subsystem for Linux is checked. Restart the system after enabling it for the changes to reflect.
 
+###Notices & Disclaimers
+Performance varies by use, configuration, and other factors. Learn more on the [Performance Index site](https://edc.intel.com/content/www/us/en/products/performance/benchmarks/overview/). 
+Performance results are based on testing as of dates shown in configurations and may not reflect all publicly available updates.  See backup for configuration details.  No product or component can be absolutely secure. 
+Your costs and results may vary. 
+Intel technologies may require enabled hardware, software, or service activation.
+© Intel Corporation.  Intel, the Intel logo, and other Intel marks are trademarks of Intel Corporation or its subsidiaries.  Other names and brands may be claimed as the property of others.  
+
+## Appendix
+
+**Date Testing Performed**: July 2022 
+
+**Configuration Details and Workload Setup**: Azure Standard_D4_v5 (Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz), 1 Socket, 2 Cores per Socket, 2 Threads per Core, Turbo: On, 16 GB total memory, Ubuntu 20.04.4 LTS, Kernel: Linux 5.13.0-1025-azure x86_64,
+Framework/Toolkit incl version for Stock: Python 1.8.0, Framework/Toolkit incl version for Intel: Intel® Extension for PyTorch 1.8.0,Intel® Neural Compressor 1.12, ML algorithm: VGG16, Dataset: Pill Data Image Dataset with ~300 Samples, Precision: FP32, INT8
+
+**Testing performed by** Intel Corporation
