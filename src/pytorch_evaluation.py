@@ -72,8 +72,8 @@ if __name__ == "__main__":
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     if intel_flag:
-        import intel_pytorch_extension as ipex
-        device = ipex.DEVICE
+        import intel_extension_for_pytorch as ipex
+        DEVICE = "cpu"
     # Load dataset
     start_time = time.time()
     train_loader, test_loader = get_train_test_loaders(

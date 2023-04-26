@@ -16,17 +16,32 @@ In this example we highlight the difference of using deep learning, machine lear
 The time required for training the model, inference time and the accuracy of the model are captured for multiple runs on the stock version as well on those in Intel® oneAPI AI Analytics Toolkit. The average of these runs are considered and the comparison have been provided.
   
 ## Key Implementation Details
-This sample code is implemented for CPU using the Python language and Intel® Extension for PyTorch* v1.8.0 has been used in this code base. VGGNet, a classical convolutional neural network (CNN) architecture is being used for training. VGG was developed to increase the depth of such CNNs in order to increase the model performance and it is widely used in computer vision use cases. Tuning parameters has been introduced to the model in an optimization algorithm with different learning rate for checking how quickly the model is adapted to the problem in order to increase the model performance.
+This sample code is implemented for CPU using the Python language and Intel® Extension for PyTorch* v1.12.300 has been used in this code base. VGGNet, a classical convolutional neural network (CNN) architecture is being used for training. VGG was developed to increase the depth of such CNNs in order to increase the model performance and it is widely used in computer vision use cases. Tuning parameters has been introduced to the model in an optimization algorithm with different learning rate for checking how quickly the model is adapted to the problem in order to increase the model performance.
 
 ### **Use Case E2E flow**
 ![Use_case_flow](assets/quality_visual_inspection_e2e_flow.png)
 
 ### Reference Sources
 *DataSet*: https://www.mvtec.com/company/research/datasets/mvtec-ad (only download Pill (262 MB) dataset for this use case)<br>
-> *Please see this data set's applicable license for terms and conditions. Intel does not own the rights to this data set and does not confer any rights to it.*
-
 *Case Study*: https://towardsdatascience.com/explainable-defect-detection-using-convolutional-neural-networks-case-study-284e57337b59<br>
 *VGG16 Model Training*: https://github.com/OlgaChernytska/Visual-Inspection
+
+### Notes
+
+_**Please see this data set's applicable license for terms and conditions. Intel®Corporation does not own the rights to this data set and does not confer any rights to it.**_
+
+### Repository clone and Anaconda installation
+
+```
+git clone https://github.com/oneapi-src/visual-quality-inspection.git
+```
+
+> **Note**: If you beginning to explore the reference kits on client machines such as a windows laptop, go to the [Running on Windows](#running-on-windows) section to ensure you are all set and come back here
+
+> **Note**: The performance measurements were captured on Xeon based processors. The instructions will work on WSL, however some portions of the ref kits may run slower on a client machine, so utilize the flags supported to modify the epochs/batch size to run the training or inference faster. Additionally performance claims reported may not be seen on a windows based client machine.
+
+> **Note**: In this reference kit implementation already provides the necessary conda environment configurations to setup the software requirements. To utilize these environment scripts, first install Anaconda/Miniconda by following the instructions at the following link  
+> [Anaconda installation](https://docs.anaconda.com/anaconda/install/linux/)
 
 ## Overview
 ### Environment
@@ -36,14 +51,16 @@ Below are the developer environment used for this module on Azure. All the obser
 | :--- | :--: | :--: | :--:
 | *Standard_D4_V5* | 4 | 16GB | ICELAKE
 
-### Packages
-| **Package**                | **Stock Python**                | **Intel Python**
-| :---                       | :---                            | :---
-| python                     | python=3.9.7=hdb3f193_2         | python=3.9.7=h718aa4a_4
-| pytorch                    | pytorch=1.8.0                   | pytorch=1.8.0=py39_0
-| IPEX                       | *NA*                            | intel-extension-for-pytorch=1.8.0=py39_0
-| neural-compressor          | neural-compressor==1.12         | *NA*
-| openVINO                   | OpenVINO™ Toolkit- 2021.4.2     | *NA*
+### Packagespytorch=1.12.0=py39_0
+| **Package**         | **Stock Python**            | **Intel Python**                          | **OpenVINO**         
+| :---                | :---                        | :---                                      | :---
+| python              | python=3.9.7=hdb3f193_2     | python=3.9.7=h718aa4a_4                   | python=3.9.7
+| pytorch             | pytorch=1.8.0               | pytorch=1.12.0=py39_0                      | *NA*
+| Intel® Extension for PyTorch                | *NA*                        | intel-extension-for-pytorch=1.12.300=py39_0 | *NA*
+| neural-compressor   | neural-compressor==1.12     | *NA*                                      | *NA*
+| OpenVINO™ Toolkit   | *NA*                        | *NA*  | openvino-dev[pytorch,onnx]==2022.1.0<br>openvino==2022.1.0
+                             
+
 
 ### Dataset
 | **Use case** | Anomaly detection on product inspection
@@ -74,17 +91,6 @@ Performed inferencing using the trained model with
 - Intel® Neural Compressor
 - Intel® Distribution of OpenVINO™ Toolkit
 
-#### Intel® Extension for PyTorch
-The below changes have been done to the stock PyTorch training code base to utilize the Intel® Extension for PyTorch* performance.
-One can enable the intel flag to incorporate below Intel Pytorch optimizations.
-```
-import intel_pytorch_extension as ipex
-...
-model = model.to(ipex.DEVICE)
-inputs = inputs.to(ipex.DEVICE)
-labels = labels.to(ipex.DEVICE)
-...
-```
 
 ## Usage and Instructions
 Below are the steps to reproduce the bechmarking results given in this repository
@@ -246,6 +252,7 @@ python pytorch_evaluation.py -d ../data -m ./{trained_model.h5} -b 1 -i 1
 ```
 
 > By using different batchsize one can observe the gain obtained using Intel® Extension for PyTorch
+  
 
 ### 5. Quantize trained models using Intel® Neural Compressor
 Intel® Neural Compressor is used to quantize the FP32 Model to the INT8 Model. Optimzied model is used here for evaluating and timing Analysis.
@@ -305,43 +312,40 @@ optional arguments:
 python neural_compressor_inference.py -d ../data/ -fp32 ../{trained_model.h5}  -int8 ./output -b 1
 ```
 > Use `-b` to test with different batch size (e.g. `-b 10`)
+  
 
 ### 6. Quantize trained models using Intel® Distribution of OpenVINO
-When it comes to the deployment of this model on Edge devices, with less computing and memory resources, we further need to explore options for quantizing and compressing the model which brings out the same level of accuracy and efficient utilization of underlying computing resources. Intel® Distribution of OpenVINO™ Toolkit facilitates the optimization of a deep learning model from a framework and deployment using an inference engine on such computing platforms based on Intel hardware accelerators. Below section covers the steps to use this toolkit for the model quantization and measure its performance.
-
-#### Setting up the environment for Intel® Distribution of OpenVINO
-*Toolkit Installation*
-Intel® Distribution of OpenVINO™ Toolkit used here is **2021.4.2** on Ubuntu 20.04 by following the installation procedure at
-https://docs.openvino.ai/latest/openvino_docs_install_guides_installing_openvino_linux.html#install-openvino
-
-*POT (Post Optimization Toolkit) Installation*
-https://docs.openvino.ai/2021.4/pot_InstallationGuide.html#doxid-pot-installation-guide
+When it comes to the deployment of this model on Edge devices, with less computing and memory resources, we further need to explore options for quantizing and compressing the model which brings out the same level of accuracy and efficient utilization of underlying computing resources. Intel® Distribution of OpenVINO™ Toolkit facilitates the optimization of a deep learning model from a framework and deployment using an inference engine on such computing platforms based on Intel hardware accelerators. Below section covers the steps to use this toolkit for the model quantization and measure its performance.  
+  
+**Setting up the environment for OpenVINO**<br>Follow the below conda installation commands to setup the OpenVINO environment. 
+```sh
+conda env create -f env/openvino_pot/openvino.yml
+```
+*Activate OpenVINO environment*
+Use the following command to activate the environment that was created:
+```sh
+conda activate openvino
+```
 
 **OpenVINO Intermediate Representation (IR) conversion** <br>
 Below are the steps to onvert ONNX model representation to OpenVINO IR using OpenVINO model converter.
 
-*Pre-requisites*
-The OpenVINO running environment has been installed as the standard installation procedure.
-
-ONNX model should be generated using `training.py` without enabling hyperparameter tuning.
-
-By default as per the openvino documentation installation location is as follows
-  1. For root or administrator: `/opt/intel/openvino_<version>/`
-  2. For regular users: `/home/<USER>/intel/openvino_<version>/`
+*Pre-requisites*  
+- ONNX model should be generated using `training.py` without enabling hyperparameter tuning.
 
 ```sh
-source /opt/intel/openvino_2021/bin/setupvars.sh
-python /opt/intel/openvino_2021/deployment_tools/model_optimizer/mo_onnx.py --input_model <trained pill onnx model> --output_dir <output directory>
+mo --input_model <trained pill onnx model> --output_dir <output directory>
 ```
 
-> The above step will generate `<model-name>.bin` and `<model-name.xml` as output which can be used with OpenVINO inference application. Default precision is FP32.
+> The above step will generate `<model-name>.bin` and `<model-name>.xml` as output which can be used with OpenVINO inference application. Default precision is FP32.
+  
 
 **Running inference using OpenVINO**<br>Command to perform inference using OpenVINO. The model need to be converted to IR format as per the section OpenVINO IR conversion. 
 
 > *Note*<br>This module is based on the hello_classification python module from the OpenVINO package.
 
 ```
-usage: openvino_inference.py [-h] -m MODEL -i INPUT [-l EXTENSION] [-c CONFIG] [-d DEVICE] [--labels LABELS] [-nt NUMBER_TOP] [--outputname OUTPUTNAME]
+usage: python src/intel_openvino/openvino_inference.py -m MODEL -i INPUT [-d DEVICE] [--labels LABELS] [-nt NUMBER_TOP]
 
 Options:
   -h, --help            Show this help message and exit.
@@ -349,17 +353,11 @@ Options:
                         Required. Path to an .xml or .onnx file with a trained model.
   -i INPUT, --input INPUT
                         Required. Path to an image file(s).
-  -l EXTENSION, --extension EXTENSION
-                        Optional. Required by the CPU Plugin for executing the custom operation on a CPU. Absolute path to a shared library with the kernels implementations.
-  -c CONFIG, --config CONFIG
-                        Optional. Required by GPU or VPU Plugins for the custom operation kernel. Absolute path to operation description file (.xml).
   -d DEVICE, --device DEVICE
                         Optional. Specify the target device to infer on; CPU, GPU, MYRIAD, HDDL or HETERO: is acceptable. The sample will look for a suitable plugin for device specified. Default value is CPU.
   --labels LABELS       Optional. Path to a labels mapping file.
   -nt NUMBER_TOP, --number_top NUMBER_TOP
                         Optional. Number of top results.
-  --outputname OUTPUTNAME
-                        Optional. Output blob name for the classification.
 ```
 *Sample output*
 ```
@@ -383,25 +381,20 @@ Post-training Optimization Tool (POT) is designed to accelerate the inference of
 *High level flow for the quantization model conversion and benchmarking*
 ![image](assets/openvino_pot_flow.png)
 
-*Environment Setup*
-- Python 3.6 or higher
-- Intel® Distribution of OpenVINO™ Toolkit v2021.4.2
-- Post-Training Optimization Tool
+**Performance Benchmarking of full precision (FP32) Model**<br>
 
-**Performance Benchmarking of full precision (FP32) Model**<br>Use the below command to run the benchmark tool for the ONNX model generated using this codebase for the pill anamoly detection. 
+> Activate OpenVINO environment before running  
+  
 
-> Assuming the Intel OpenVINO toolkit is installed and the POT Installation has been completed as per the OpenVINO guide.
-> NOTE: Running setupvars.sh is required only once
+Use the below command to run the benchmark tool for the ONNX model generated using this codebase for the pill anamoly detection. 
 
 ```sh
-source /opt/intel/openvino_2021/bin/setupvars.sh
-python3 /opt/intel/openvino_2021/deployment_tools/tools/benchmark_tool/benchmark_app.py -m pill_intel_model.onnx
+benchmark_app -m pill_intel_model.onnx
 ```
 
 Use the below command to run the benchmark tool for the OpenVINO IR model generated using this codebase for the pill anamoly detection. 
 ```sh
-source /opt/intel/openvino_2021/bin/setupvars.sh
-python3 /opt/intel/openvino_2021/deployment_tools/tools/benchmark_tool/benchmark_app.py -m pill_intel_model.xml -api async -niter 120 -nireq 1 -b 1<batch_size> -nstreams 1 -nthreads <number_of_cpu_cores>
+benchmark_app -m pill_intel_model.xml -api async -niter 120 -nireq 1 -b <batch_size> -nstreams 1 -nthreads <number_of_cpu_cores>
 ```
 
 #### Model Quantization
@@ -426,11 +419,10 @@ python3 /opt/intel/openvino_2021/deployment_tools/tools/benchmark_tool/benchmark
 *DefaultQuantization* : `env/openvino_pot/pill_intel_model_int8.json`
 *AccuracyAwareQuantization* : `env/openvino_pot/pill_intel_model_int8_acc.json`
 
-> **Note**<br>These json files contains paths of FPIR model
+> **Note**<br>These json files contains paths of FP32 IR model
 
 Use the below command to quantize the model as per the requirement. 
 ```sh
-source /opt/intel/openvino_2021/bin/setupvars.sh
 pot -c env/openvino_pot/pill_intel_model_int8.json -e
 ```
 
@@ -440,17 +432,16 @@ pot -c env/openvino_pot/pill_intel_model_int8.json -e
 Use the below command to run the benchmark tool for the Quantized OpenVINO IR model generated using the steps given in the previous section.
 
 ```sh
-source /opt/intel/openvino_2021/bin/setupvars.sh
-python3 /opt/intel/openvino_2021/deployment_tools/tools/benchmark_tool/benchmark_app.py -m results/<path_to_the_quantized_model/pill_intel_model.xml -api async -niter 120 -nireq 1 -b 1<batch_size> -nstreams 1 -nthreads <number_of_cpu_cores>
+benchmark_app -m results/<path_to_the_quantized_model/pill_intel_model.xml -api async -niter 120 -nireq 1 -b <batch_size> -nstreams 1 -nthreads <number_of_cpu_cores>
 ```
 
 ### 7. Observations
-This section covers the prediction time comparison between Stock PyTorch 1.8.0 and Intel PyTorch Extension (IPEX) 1.8.0 for this model.
+This section covers the prediction time comparison between Stock PyTorch 1.8.0 and Intel PyTorch Extension 1.8.0 for this model.
 
 ![image](assets/pytorch_prediction_time.png)
 <br>**Key Takeaways**
-- Realtime prediction time speedup with IPEX 1.8.0 shows up to 2.22x against stock Pytorch 1.8.0 for the Pill anomaly detection model
-- Batch prediction time speedup with IPEX 1.8.0 shows from 1.04x to 1.38x against stock Pytorch 1.8.0 for the Pill anomaly detection model
+- Realtime prediction time speedup with Intel® Extension for PyTorch 1.8.0 shows up to 2.22x against stock Pytorch 1.8.0 for the Pill anomaly detection model
+- Batch prediction time speedup with Intel® Extension for PyTorch 1.8.0 shows from 1.04x to 1.38x against stock Pytorch 1.8.0 for the Pill anomaly detection model
 
 #### Intel Neural Compressor
 Below are the observations on the inference timing on the quantized model created using Intel® Neural Compressor(INC) on Azure Standard_D4_V5 instance.
@@ -460,7 +451,7 @@ Below are the observations on the inference timing on the quantized model create
 - Realtime prediction time speedup with Stock Pytorch 1.8.0 INC INT8 quantized Pill anomaly detection model shows up to 8.15x against Stock Pytorch 1.8.0 FP32 model
 - Batch prediction time speedup with Stock Pytorch 1.8.0 INC INT8 quantized Pill anomaly detection model shows from 3.18x  to 4.54x against Stock Pytorch 1.8.0 FP32 model
 
-> Gain obtained here is purely with Intel® Neural Compressor(INC) quantized model without any IPEX optimizations.<br>There is only 0.001% Accuracy drop observed post quantization of FP32 model in both phases.
+> Gain obtained here is purely with Intel® Neural Compressor(INC) quantized model without any Intel® Extension for PyTorch optimizations.<br>There is only 0.001% Accuracy drop observed post quantization of FP32 model in both phases.
 
 #### OpenVINO Post-Training Optimization Tool
 This section covers the benchmarking observations using the pre and post quantized model using OpenVINO Post-Training Optimization Tool .
@@ -479,5 +470,26 @@ This section covers the benchmarking observations using the pre and post quantiz
 #### Conclusion
 With the arrival of computer vision (CV) techniques, powered by AI and deep learning, visual inspection has been digitalized and automated. Factories have installed cameras in each production line and huge quantities of images are read and processed using a deep learning model trained for defect detection. If each production line will have its CV application running on the edge to train that can show the scale of the challenge this industry faces with automation. CV applications demand, however, huge amounts of processing power to process the increasing image load, requiring a trade-off between accuracy, inference performance, and compute cost. Manufacturers will look for easy and cost-effective ways to deploy computer vision applications across edge-cloud infrastructures to balance the cost without impacting accuracy and inference performance. This reference kit implementation provides performance-optimized guide around quality visual inspection use cases that can be easily scaled across similar use cases.
 
-## Notes:
-***Please see this data set's applicable license for terms and conditions. Intel® does not own the rights to this data set and does not confer any rights to it.***
+## Appendix
+
+### **Running on Windows**
+
+The reference kits commands are linux based, in order to run this on Windows, goto Start and open WSL and follow the same steps as running on a linux machine starting from git clone instructions. If WSL is not installed you can [install WSL](https://learn.microsoft.com/en-us/windows/wsl/install).
+
+> **Note** If WSL is installed and not opening, goto Start ---> Turn Windows feature on or off and make sure Windows Subsystem for Linux is checked. Restart the system after enabling it for the changes to reflect.
+
+## Notices & Disclaimers
+Performance varies by use, configuration, and other factors. Learn more on the [Performance Index site](https://edc.intel.com/content/www/us/en/products/performance/benchmarks/overview/). 
+Performance results are based on testing as of dates shown in configurations and may not reflect all publicly available updates.  See backup for configuration details.  No product or component can be absolutely secure. 
+Your costs and results may vary. 
+Intel technologies may require enabled hardware, software, or service activation.
+© Intel Corporation.  Intel, the Intel logo, and other Intel marks are trademarks of Intel Corporation or its subsidiaries.  Other names and brands may be claimed as the property of others.  
+
+## Appendix
+
+**Date Testing Performed**: July 2022 
+
+**Configuration Details and Workload Setup**: Azure Standard_D4_v5 (Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz), 1 Socket, 2 Cores per Socket, 2 Threads per Core, Turbo: On, 16 GB total memory, Ubuntu 20.04.4 LTS, Kernel: Linux 5.13.0-1025-azure x86_64,
+Framework/Toolkit incl version for Stock: Python 1.8.0, Framework/Toolkit incl version for Intel: Intel® Extension for PyTorch 1.8.0,Intel® Neural Compressor 1.12, ML algorithm: VGG16, Dataset: Pill Data Image Dataset with ~300 Samples, Precision: FP32, INT8
+
+**Testing performed by** Intel Corporation

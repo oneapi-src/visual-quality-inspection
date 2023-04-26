@@ -1,11 +1,12 @@
 name: aikit-pt
 channels:
   - intel
+  - pytorch
 dependencies:
-  - intel-aikit-pytorch=2022.0.0
   - cpuonly
   - python=3.9.7
   - pip=21.2.4
+  - pytorch::pytorch==1.12.0
   - pip:
     - matplotlib==3.5.1
     - scikit-learn==1.0.2
@@ -15,3 +16,5 @@ dependencies:
     - torchsummary==1.5.1
     - tqdm==4.64.0
     - pillow==9.0.1
+    - intel_extension_for_pytorch==1.12.300
+    - torchvision==0.13.0
