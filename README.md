@@ -282,7 +282,7 @@ optional arguments:
 > Activate stock Environment before running
 ```
 cd intel_neural_compressor
-python neural_compressor_conversion.py -d ../data/ -m ../{trained_model.h5} 
+python neural_compressor_conversion.py -d ../../data/ -m ../{trained_model.h5} 
 ```
 > Quantized model will be saved by default in `output` folder
 
@@ -309,7 +309,7 @@ optional arguments:
 
 *Command to run neural_compressor_inference for realtime `(batchsize =1)`*
 ```
-python neural_compressor_inference.py -d ../data/ -fp32 ../{trained_model.h5}  -int8 ./output -b 1
+python neural_compressor_inference.py -d ../../data/ -fp32 ../{trained_model.h5}  -int8 ./output -b 1
 ```
 > Use `-b` to test with different batch size (e.g. `-b 10`)
   

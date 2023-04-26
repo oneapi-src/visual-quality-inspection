@@ -18,3 +18,4 @@ dependencies:
     - pillow==9.0.1
     - intel_extension_for_pytorch==1.12.300
     - torchvision==0.13.0
+    - numpy==1.19.5
