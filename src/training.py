@@ -18,6 +18,9 @@
 import os
 import sys
 import time
+library_path= "/dbfs/FileStore/tables/visual-quality-inspection-main/src/"
+sys.path.append(library_path)
+import time
 import argparse
 import itertools
 import torch
