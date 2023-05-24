@@ -18,7 +18,7 @@ from utils.constants import (
 )
 
 
-def data_augmentation(inputs, labels):
+def data_augmentation(inputs, labels, device):
     """
     This module is responsible for applying data augumentation
     on existing dataset
@@ -55,7 +55,7 @@ def data_augmentation(inputs, labels):
         img_enhance = img_enhance_transform(img_p(inputs[i]))
         n_inputs.append(img_enhance)
         n_labels.append(labels[i])
-    return torch.stack(n_inputs, 0), torch.stack(n_labels, 0)
+    return torch.stack(n_inputs, 0).to(device), torch.stack(n_labels, 0).to(device)
 
 
 def train(dataloader, model, optimizer, criterion,
@@ -80,7 +80,7 @@ def train(dataloader, model, optimizer, criterion,
         for inputs1, labels1 in dataloader:
             inputs, labels = inputs1, labels1
             if data_aug:
-                inputs, labels = data_augmentation(inputs1, labels1)
+                inputs, labels = data_augmentation(inputs1, labels1, device)
             inputs = inputs.to(device)
             labels = labels.to(device)
 
@@ -126,7 +126,7 @@ def evaluate(model, dataloader, device):
         preds_probs = model(inputs)[0]
         infer_time = time.time()-start_time
         print('infer_time_per_sample=', infer_time)
-        preds_class = torch.argmax(preds_probs, dim=-1)
+        preds_class = torch.argmax(preds_probs.cpu(), dim=-1)
         labels = labels.to("cpu").numpy()
         preds_class = preds_class.detach().to("cpu").numpy()
         y_true = np.concatenate((y_true, labels))
@@ -206,7 +206,7 @@ def predict_localize(
         feature_maps = out[1].to(device)
 
         for img_i in range(inputs.size(0)):
-            img = transform_to_pil(inputs[img_i])
+            img = transform_to_pil(inputs[img_i].cpu())
             class_pred = class_preds[img_i]
             heatmap = feature_maps[img_i][NEG_CLASS].detach().cpu().numpy()
 
