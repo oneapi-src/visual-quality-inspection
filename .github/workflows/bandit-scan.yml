@@ -1,0 +1,33 @@
+name: "bandit-scan"
+run-name: "Bandit Scan"
+
+on: [push]
+
+jobs:
+  # Run Bandit Scan
+  Bandit_Scan:
+    uses: intel-innersource/frameworks.actions.pact.bandit-scan/.github/workflows/Bandit_Scan.yml@main
+    with:
+      BANDIT_TARGET: "./"
+      BANDIT_REPORT_TARGET: "Bandit_Report"
+      BANDIT_REPORT_TYPE: "txt"
+      BANDIT_DEBUG: true
+
+  Check_Reports:
+    needs: Bandit_scan
+    runs-on: [self-hosted, Linux, apollo]
+    steps:
+      - name: Restore
+        uses: actions/cache/restore@v3
+        with:
+          path: Bandit_Report
+          key: bandit_scan-${{ github.run_id }}-${{ github.run_attempt }}
+      - name: Check
+        run: |
+          if [[ -f "Bandit_Report/BandItScan_Report.txt" ]]; then
+              cat Bandit_Report/BandItScan_Report.txt
+          else
+              echo "Report is missing"
+              ls Bandit_Report
+              exit 1
+          fi
