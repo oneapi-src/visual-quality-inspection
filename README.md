@@ -1,155 +1,228 @@
-# **PyTorch Quality Visual Inspection**
-PyTorch is a machine learning open source framework, and is based on the popular Torch library. PyTorch is designed to provide good flexibility and high speeds for deep neural network implementation.
-PyTorch is different from other deep learning frameworks in that it uses dynamic computation graphs. While static computational graphs (like those used in TensorFlow) are defined prior to runtime, dynamic graphs are defined "on the fly" via the forward computation. In other words, the graph is rebuilt from scratch on every iteration.
+# Quality Visual Inspection
 
-Intel® Extension for PyTorch provides additional optimizations for an extra performance boost on Intel® CPU.
+## Introduction
 
-| Platform                          | Ubuntu 20.04
-| :---                              | :---
-| Hardware                          | Azure Standard_D4_V5 (Icelake)
-| Software                          | Intel® Distribution for Python, Intel® Extension for PyTorch, Intel® Neural Compressor, Intel® Distribution of OpenVINO™ Toolkit.
-| What you will learn               | Advantage of using components in Intel® oneAPI AI Analytics Toolkit over the stock version for the computer vision based model build, tuning and inferencing.
+The goal of this visual inspection use case is to provide AI-powered quality visual inspection on a dataset for the pharma industry which includes different data augmentations. For this purpose, a computer vision model is built using machine learning tools/libraries in Intel® oneAPI AI Analytics Toolkit. Specifically, Intel® Extension for PyTorch\* is utilized to enhance performance on Intel® hardware.
 
-## Purpose
-In this example we highlight the difference of using deep learning, machine learning tools/libraries in Intel® oneAPI AI Analytics Toolkit against the stock versions. We use a computer vision based model building for quality visual inspection based on a dataset for pharma industry. It includes different data augmentations and train the VGG model using this dataset.
+Check out more workflow examples and reference implementations in the [Developer Catalog](https://developer.intel.com/aireferenceimplementations).
 
-The time required for training the model, inference time and the accuracy of the model are captured for multiple runs on the stock version as well on those in Intel® oneAPI AI Analytics Toolkit. The average of these runs are considered and the comparison have been provided.
-  
-## Key Implementation Details
-This sample code is implemented for CPU using the Python language and Intel® Extension for PyTorch* v1.12.300 has been used in this code base. VGGNet, a classical convolutional neural network (CNN) architecture is being used for training. VGG was developed to increase the depth of such CNNs in order to increase the model performance and it is widely used in computer vision use cases. Tuning parameters has been introduced to the model in an optimization algorithm with different learning rate for checking how quickly the model is adapted to the problem in order to increase the model performance.
+## **Table of Contents**
 
-### **Use Case E2E flow**
+- [Solution Technical Overview](#solution-technical-overview)
+  - [Dataset](#Dataset)
+- [Validated Hardware Details](#validated-hardware-details)
+- [Software Requirements](#software-requirements)
+- [How it Works?](#how-it-works)
+- [Get Started](#get-started)
+  - [Download the Workflow Repository](#Download-the-Workflow-Repository)
+- [Ways to run this reference use case](#Ways-to-run-this-reference-use-case)
+  - [Run Using Bare Metal](#run-using-bare-metal)
+  - [Run Using Docker](#run-using-docker)
+- [Expected Output](#expected-output)
+- [Summary and Next Steps](#summary-and-next-steps)
+  - [Adopt to your dataset](#adopt-to-your-dataset)
+- [Learn More](#learn-more)
+- [Support](#support)
+
+## Solution Technical Overview
+
+PyTorch* is a machine learning open source framework, and is based on the popular Torch library. PyTorch* is designed to provide good flexibility and high speeds for deep neural network implementation. PyTorch* is different from other deep learning frameworks in that it uses dynamic computation graphs. While static computational graphs (like those used in TensorFlow*) are defined prior to runtime, dynamic graphs are defined "on the fly" via the forward computation. In other words, the graph is rebuilt from scratch on every iteration.
+
+Manual visual Inspection involves analyzing data and identifying anomalies through human observation and intuition. It can be useful in certain scenarios and also has several challenges and limitations. Some difficulties that can be found when performing manual anomaly detection are subjectivity, limited pattern recognition, lack of consistency, time and cost, and detection latency, among others.
+
+The solution contained in this repo uses the following Intel® packages:
+
+> - **Intel® Distribution for Python\***
+>
+>   The [Intel® Distribution for Python\*](https://www.intel.com/content/www/us/en/developer/tools/oneapi/distribution-for-python.html#gs.52te4z) provides:
+>
+>   - Scalable performance using all available CPU cores on laptops, desktops, and powerful servers
+>   - Support for the latest CPU instructions
+>   - Near-native performance through acceleration of core numerical and machine learning packages with libraries like the Intel® oneAPI Math Kernel Library (oneMKL) and Intel® oneAPI Data Analytics Library
+>   - Productivity tools for compiling Python code into optimized instructions
+>   - Essential Python bindings for easing integration of Intel® native tools with your Python\* project
+>
+> - **Intel® Extension for Pytorch\***
+>
+>   The [Intel® Extension for PyTorch\*](https://github.com/intel/intel-extension-for-pytorch/tree/xpu-master):
+>
+>   - Extends PyTorch\* with up-to-date features optimizations for an extra performance boost on Intel hardware
+>   - Optimizations take advantage of AVX-512 Vector Neural Network Instructions (AVX512 VNNI) and Intel® Advanced Matrix Extensions (Intel® AMX) on Intel CPUs as well as Intel Xe Matrix Extensions (XMX) AI engines on Intel discrete GPUs
+>   - Through PyTorch* xpu device, Intel® Extension for PyTorch* provides easy GPU acceleration for Intel discrete GPUs with PyTorch\*
+>   - Provides optimizations for both eager mode and graph mode
+>
+> - **Intel® Neural Compressor\***
+>
+>   The [Intel® Neural Compressor\*](https://github.com/intel/neural-compressor) aims to provide popular model compression techniques such as quantization, pruning (sparsity), distillation, and neural architecture search on mainstream frameworks such as TensorFlow, PyTorch, ONNX Runtime, and MXNet, as well as Intel extensions such as Intel Extension for TensorFlow and Intel Extension for PyTorch.
+
+For more details, visit [Quality Visual Inspection GitHub](https://github.com/intel-innersource/frameworks.ai.platform.sample-apps.visual-quality-inspection) repository.
+
+## Solution Technical Details
+
 ![Use_case_flow](assets/quality_visual_inspection_e2e_flow.png)
 
-### Reference Sources
-*DataSet*: https://www.mvtec.com/company/research/datasets/mvtec-ad (only download Pill (262 MB) dataset for this use case)<br>
-*Case Study*: https://towardsdatascience.com/explainable-defect-detection-using-convolutional-neural-networks-case-study-284e57337b59<br>
-*VGG16 Model Training*: https://github.com/OlgaChernytska/Visual-Inspection
-
-### Notes
-
-_**Please see this data set's applicable license for terms and conditions. Intel®Corporation does not own the rights to this data set and does not confer any rights to it.**_
-
-### Repository clone and Anaconda installation
-
-```
-git clone https://github.com/oneapi-src/visual-quality-inspection.git
-```
-
-> **Note**: If you beginning to explore the reference kits on client machines such as a windows laptop, go to the [Running on Windows](#running-on-windows) section to ensure you are all set and come back here
-
-> **Note**: The performance measurements were captured on Xeon based processors. The instructions will work on WSL, however some portions of the ref kits may run slower on a client machine, so utilize the flags supported to modify the epochs/batch size to run the training or inference faster. Additionally performance claims reported may not be seen on a windows based client machine.
-
-> **Note**: In this reference kit implementation already provides the necessary conda environment configurations to setup the software requirements. To utilize these environment scripts, first install Anaconda/Miniconda by following the instructions at the following link  
-> [Anaconda installation](https://docs.anaconda.com/anaconda/install/linux/)
-
-## Overview
-### Environment
-Below are the developer environment used for this module on Azure. All the observations captured are based on these environment setup.
-
-| **Size** | **CPU Cores** | **Memory**  | **Intel CPU Family**
-| :--- | :--: | :--: | :--:
-| *Standard_D4_V5* | 4 | 16GB | ICELAKE
-
-### Packagespytorch=1.12.0=py39_0
-| **Package**         | **Stock Python**            | **Intel Python**                          | **OpenVINO**         
-| :---                | :---                        | :---                                      | :---
-| python              | python=3.9.7=hdb3f193_2     | python=3.9.7=h718aa4a_4                   | python=3.9.7
-| pytorch             | pytorch=1.8.0               | pytorch=1.12.0=py39_0                      | *NA*
-| Intel® Extension for PyTorch                | *NA*                        | intel-extension-for-pytorch=1.12.300=py39_0 | *NA*
-| neural-compressor   | neural-compressor==1.12     | *NA*                                      | *NA*
-| OpenVINO™ Toolkit   | *NA*                        | *NA*  | openvino-dev[pytorch,onnx]==2022.1.0<br>openvino==2022.1.0
-                             
-
+This sample code is implemented for CPU using the Python language and Intel® Extension for PyTorch\* v1.13.120 has been used in this code base. VGGNet, a classical convolutional neural network (CNN) architecture is being used for training. The Visual Geometric Group model (VGG) was developed to increase the depth of such CNNs in order to increase the model performance and it is widely used in computer vision use cases. Tuning parameters has been introduced to the model in an optimization algorithm with different learning rate for checking how quickly the model is adapted to the problem in order to increase the model performance.
 
 ### Dataset
-| **Use case** | Anomaly detection on product inspection
-| :--- | :---
-| **Object of interest** | Pill
-| **Data augmentation techniques** | Flipping, Rotation, Enhancing, Center cropping
-| **Size** | Total 700 Labelled Images<br> (Post data cloning)
-| **Train : Test Split** | 80:20
 
-## Training
+[MVTec AD](https://www.mvtec.com/company/research/datasets/mvtec-ad) [[1]](#mvtec_ad_dataset) is a dataset for benchmarking anomaly detection methods with a focus on industrial inspection (follow this [link](#legal_disclaimer) to read the legal disclaimer). It contains over 5000 high-resolution images divided into fifteen different object and texture categories. Each category comprises a set of defect-free training images and a test set of images with various kinds of defects as well as images without defects. We are going to use only the Pill (262 MB) dataset for this use case.
+
+More information can be found on the case study [Explainable Defect Detection Using Convolutional Neural Networks: Case Study](https://towardsdatascience.com/explainable-defect-detection-using-convolutional-neural-networks-case-study-284e57337b59) [[2]](#case_study) and in [VGG16 Model Training](https://github.com/OlgaChernytska/Visual-Inspection) [[3]](#vgg).
+
+![Statistical_overview_of_the_MVTec_AD_dataset](assets/mvtec_dataset_characteristics.JPG)
+<br>
+Table 1: Statistical overview of the MVTec AD dataset. For each category, the number of training and test images is given together with additional information about the defects present in the respective test images [[4]](#mvtec_ad).
+
+## Validated Hardware Details
+
+There are workflow-specific hardware and software setup requirements depending on how the workflow is run. Bare metal development system and Docker\* image running locally have the same system requirements.
+
+| Recommended Hardware                                            | Precision  |
+| --------------------------------------------------------------- | ---------- |
+| CPU: Intel® 2nd Gen Xeon® Platinum 8280 CPU @ 2.70GHz or higher | FP32, INT8 |
+| RAM: 187 GB                                                     |            |
+| Recommended Free Disk Space: 20 GB or more                      |            |
+
+Code was tested on Ubuntu\* 22.04 LTS.
+
+## How it Works
+
+This reference use case uses a classical convolutional neural network (CNN) architecture, named VGGNet, implemented for CPU using the Python language and Intel® Extension for PyTorch\*. VGG was developed to increase the depth of such CNNs in order to increase the model performance and it is widely used in computer vision use cases.
+
+The use case can be summarized in three steps:
+
+1. Training
+1. Tunning
+1. Inference
+
+### 1) Training
+
 VGG-16 is a convolutional neural network that is 16 layers deep and same has been used as classification architecture to classify the good and defect samples from the production pipeline.
-Intel® Extension for PyTorch* is used for transfer learning the VGGNet classification architecture on the pill dataset created. Same experiment performed in stock PyTorch version of VGGNet.
+Intel® Extension for PyTorch\* is used for transfer learning the VGGNet classification architecture on the pill dataset created.
 
-| **Input Size** | 224x224
-| :--- | :---
-| **Output Model format** | pytorch
+| **Input Size**          | 224x224   |
+| :---------------------- | :-------- |
+| **Output Model format** | PyTorch\* |
 
-### Tuning
-Created VGGNet classification architecture on the dataset and fine tune the hyper parameters to reach out the maximum accuracy. Introduced different learning rate to the model architecture on the dataset, also we increased the number of epochs to reach maximum accuracy on the training set. HyperParameters considered for tuning are Learning Rate & Epochs.
+### 2) Tuning
 
-*Parameters considered* `Learning Rate, Epochs, Target training accuracy`
+Created VGGNet classification architecture on the dataset and fine tune the hyper parameters to reach out the maximum accuracy. Introduced different learning rate to the model architecture on the dataset, also we increased the number of epochs to reach maximum accuracy on the training set. Hyperparameters considered for tuning are Learning Rate & Epochs.
+
+_Parameters considered_ `Learning Rate, Epochs, Target training accuracy`
+
 > Created code replication for GridSearchCV to support the code base.
 
-### Inference
+### 3) Inference
+
 Performed inferencing using the trained model with
-- Stock PyTorch
-- Intel® Extension for PyTorch
+
+- Intel® Extension for PyTorch\*
 - Intel® Neural Compressor
-- Intel® Distribution of OpenVINO™ Toolkit
 
+## Get Started
 
-## Usage and Instructions
-Below are the steps to reproduce the bechmarking results given in this repository
-1. Creating the execution environment
-2. Dataset preparation
-3. Training VGG16 model
-4. Model Inference
-5. Quantize trained models using INC and benchmarking
-6. Quantize trained models using OpenVINO and benchmarking
-7. Observations
+Define an environment variable that will store the workspace path, this can be an existing directory or one created specifically for this reference use case. You can use the following commands.
 
-### 1. Environment Creation
-#### Prerequistes
-[Anaconda installation](https://docs.anaconda.com/anaconda/install/linux/)
+[//]: # (capture: baremetal)
 
-**Setting up the environment for Stock PyTorch**<br>Follow the below conda installation commands to setup the Stock PyTorch environment for the model training and prediction. 
-```sh
-conda env create -f env/stock/stock-pytorch.yml
 ```
-*Activate stock conda environment*
-Use the following command to activate the environment that was created:
-```sh
-conda activate stock-pytorch
+export WORKSPACE=$PWD/visual-quality-inspection
+export DATA_DIR=$WORKSPACE/data
+export OUTPUT_DIR=$WORKSPACE/output
 ```
 
-**Setting up the environment for Intel PyTorch**<br>Follow the below conda installation commands to setup the Intel PyTorch environment for the model training and prediction.
-```sh
-conda env create -f env/intel/aikit-pt.yml
+### Download the Workflow Repository
+
+Create a working directory for the workflow and clone the [Quality Visual Inspection](https://github.com/oneapi-src/visual-quality-inspection) repository into your working directory.
+
 ```
-*Activate intel conda environment*
-Use the following command to activate the environment that was created:
-```sh
-conda activate aikit-pt
+mkdir -p $WORKSPACE && cd $WORKSPACE
+git clone https://github.com/intel-innersource/frameworks.ai.platform.sample-apps.visual-quality-inspection.git .
 ```
 
-### 2. Data preparation
+### Set up Miniconda
+
+1. Download the appropriate Miniconda Installer for linux.
+
+   ```bash
+   wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+   ```
+
+2. In your terminal, run.
+
+   ```bash
+   bash Miniconda3-latest-Linux-x86_64.sh
+   ```
+
+3. Delete downloaded file.
+
+   ```bash
+   rm Miniconda3-latest-Linux-x86_64.sh
+   ```
+
+To learn more about conda installation, see the [Conda Linux installation instructions](https://docs.conda.io/projects/conda/en/stable/user-guide/install/linux.html).
+
+### Set Up Environment
+
+```sh
+conda config --set solver libmamba
+conda env create -f $WORKSPACE/env/intel_env.yml --no-default-packages
+conda activate visual_inspection_intel
+```
+
+Environment setup is required only once. This step does not cleanup the existing environment with the same name hence we need to make sure there is no conda environment exists with the same name. During this setup, `visual_inspection_intel` conda environment will be created with the dependencies listed in the YAML configuration.
+
+#### Known Limitations
+
+<a id="Known_Limitations"></a>
+
+[Intel® AI Analytics Toolkit Release Notes](https://www.intel.com/content/www/us/en/developer/articles/release-notes/oneapi-ai-analytics-toolkit-release-notes.html): 
+Utilizing Intel® Optimization for PyTorch* and Intel® Extension for PyTorch* on Intel® Xeon® Scalable Processors Familiy without GPU accelerator requires installing Intel® Extension for PyTorch with CPU support inside environment with the following command:
+
+```bash
+python -m pip install intel_extension_for_pytorch -f https://developer.intel.com/ipex-whl-stable-cpu torch==2.0.1
+```
+
+### Download the Dataset
 
 > The pill dataset is downloaded and extracted in a folder before running the training python module.
 
-The dataset available from the source requires a filtering before the training. Assuming the pill dataset is downloaded from the dataset source given above in this document, Follow the below steps to filter the dataset extracted from the source.
+Download the mvtec dataset using Intel® Model Zoo Dataset Librarian (You can get the Dataset from [MVTec AD](https://www.mvtec.com/company/research/datasets/mvtec-ad) [[1]](#mvtec_ad_dataset)). We are going to use the **pill dataset**.
+
+More details of the Intel® Model Zoo Dataset Librarian can be found [here](https://github.com/IntelAI/models/tree/master/datasets/dataset_api) and, terms and conditions can be found [here](https://github.com/IntelAI/models/blob/master/datasets/dataset_api/src/dataset_librarian/terms_and_conditions.txt).
+
+[//]: # (capture: baremetal)
+
 ```sh
-tar -xf pill.tar.xz
+python -m dataset_librarian.dataset -n mvtec-ad --download --preprocess -d $DATA_DIR
+```
 
-mkdir -p data/{train/{good,bad},test/{good,bad}}
+Note: See this dataset's applicable license for terms and conditions. Intel Corporation does not own the rights to this dataset and does not confer any rights to it.
 
-cd pill/train/good/
-cp $(ls | head -n 210) ../../../data/train/good/
-cp $(ls | tail -n 65) ../../../data/test/good/
+#### Dataset Preparation
 
-cd pill/test/combined
-cp $(ls | head -n 17) ../../../data/train/bad/
-cp $(ls | tail -n 5) ../../../data/test/bad/
+The dataset available from the source requires a filtering before the training. Assuming the pill dataset is downloaded with the Intel® Model Zoo Dataset Librarian or using from the dataset source given above in this document, follow the below steps to filter the dataset extracted from the source.
+
+[//]: # (capture: baremetal)
+
+```sh
+mkdir -p $DATA_DIR/{train/{good,bad},test/{good,bad}}
+
+cd $DATA_DIR/pill/train/good/
+cp $(ls | head -n 210) $DATA_DIR/train/good/
+cp $(ls | tail -n 65) $DATA_DIR/test/good/
+
+cd $DATA_DIR/pill/test/combined
+cp $(ls | head -n 17) $DATA_DIR/train/bad/
+cp $(ls | tail -n 5) $DATA_DIR/test/bad/
 ```
 
 **Data Cloning**
 
-> **Note** Data cloning is optional step to reproduce the simillar training and tuning benchmarking results pubilshed in this repository
+> **Note** Data cloning is an optional step
 
 Assuming that pill dataset is downloaded and created the folder structure as mentioned above. Use the below code to clone the data to handle data distribution. Data will be cloned in same directory (e.g. "data")
+
 ```
 usage: clone_dataset.py [-h] [-d DATAPATH]
 
@@ -160,47 +233,348 @@ optional arguments:
 ```
 
 Use the below sample command to perform data cloning
+
+[//]: # (capture: baremetal)
+
 ```sh
-python clone_dataset.py -d ../data 
+cd $WORKSPACE/src
+python clone_dataset.py -d $DATA_DIR
 ```
 
-### 3. Training VGG16 model
+### Supported Runtime Environment
+
+This reference kit offers two options for running the fine-tuning and inference processes:
+
+- [Bare Metal](#run-using-bare-metal)
+- [Docker](#run-using-docker)
+
+Details about each of these methods can be found below. Keep in mind that each method must be executed in a separate environment from each other. If you run first Docker Compose and then bare metal, this will cause issues.
+
+> **Note**: The performance were tested on Xeon based processors. Some portions of the ref kits may run slower on a client machine, so utilize the flags supported to modify the epochs/batch size to run the training or inference faster.
+
+## Run Using Bare Metal
+
+> **Note**: Follow these instructions to set up and run this workflow on your own development system. For running a provided Docker image with Docker, see the [Docker instructions](#run-using-docker).
+
+### Set Up and run Workflow
+
+Below are the steps to reproduce the bechmarking results given in this repository
+
+1. Training VGG16 model
+1. Model Inference
+1. Quantize trained models using INC and benchmarking
+
+### 1. Training VGG16 model
+
 Run the training module as given below to start training and prediction using the active environment. This module takes option to run the training with and without hyper parameter tuning.
+
 ```
-usage: training.py [-h] [-d DATAPATH] [-o OUTMODEL] [-a DATAAUG] [-hy HYPERPARAMS] [-i INTEL]
+usage: training.py [-h] [-d DATAPATH] [-o OUTMODEL] [-a DATAAUG] [-hy HYPERPARAMS]
 
 optional arguments:
   -h, --help            show this help message and exit
   -d DATAPATH, --datapath DATAPATH
                         dataset path which consists of train and test folders
   -o OUTMODEL, --outmodel OUTMODEL
-                        outfile name without extension to save the model
+                        outfile name without extension to save the model.
   -a DATAAUG, --dataaug DATAAUG
                         use 1 for enabling data augmentation, default is 0
   -hy HYPERPARAMS, --hyperparams HYPERPARAMS
                         use 1 for enabling hyperparameter tuning, default is 0
-  -i INTEL, --intel INTEL
-                        use 1 for enabling intel pytorch optimizations, default is 0
 ```
-*Command to run stock training without data augmentation and hyperparameter tuning*
-```sh
-python training.py -d ../data
-```
-*Command to run stock training with data augmentation and without hyperparameter tuning*
-```sh
-python training.py -d ../data -a 1
-```
-*Command to run stock training with hyperparameter tuning*
-```sh
-python training.py -d ../data -hy 1
-```
-*Command to run stock training with data augmentation and hyperparameter tuning*
-```sh
-python training.py -d ../data -a 1 -hy 1
-```
-> **Note**<br>Above training commands can be run in intel environment with intel flag (e.g. "-i 1") enabled<br>The output trained model would be saved in both pytorch and onnx format. ONNX format can be used for OpenVINO IR conversion directly.
 
-*Expected Output for training without data augmentation and hyperparameter tuning*<br>Below output would be generated by the training module which will capture the overall training time.
+_You need to change directory to src folder_
+
+[//]: # (capture: baremetal)
+
+```sh
+cd $WORKSPACE/src
+```
+
+_Command to run training without data augmentation and hyperparameter tuning_
+
+[//]: # (capture: baremetal)
+
+```sh
+python training.py -d $DATA_DIR -o $OUTPUT_DIR/pill_intel_model.h5
+```
+
+The model is saved in the OUTPUT_DIR as pill_intel.h5.
+
+_Command to run training with data augmentation and without hyperparameter tuning_
+
+[//]: # (capture: baremetal)
+
+```sh
+python training.py -d  $DATA_DIR -a 1 -o $OUTPUT_DIR/pill_intel_model.h5
+```
+
+_Command to run training with hyperparameter tuning_
+
+[//]: # (capture: baremetal)
+
+```sh
+python training.py -d $DATA_DIR -hy 1 -o $OUTPUT_DIR/pill_intel_model.h5
+```
+
+_Command to run training with data augmentation and hyperparameter tuning_
+
+[//]: # (capture: baremetal)
+
+```sh
+python training.py -d $DATA_DIR -a 1 -hy 1 -o $OUTPUT_DIR/pill_intel_model.h5
+```
+
+### 2. Inference
+
+#### Running inference using PyTorch\*
+
+Use the following commands to run the inference on test images and get the inference timing for each batch of images.<br>
+
+```
+usage: pytorch_evaluation.py [-h] [-d DATA_FOLDER] [-m MODEL_PATH] [-b BATCHSIZE]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -d DATA_FOLDER, --data_folder DATA_FOLDER
+                        dataset path which consists of train and test folders
+  -m MODEL_PATH, --model_path MODEL_PATH
+                        Absolute path to the h5 PyTorch* model with extension ".h5"
+
+  -b BATCHSIZE, --batchsize BATCHSIZE
+                        use the batchsize that want do inference, default is 1
+```
+
+_You need to activate visual_inspection_intel environment and change directory to src folder_
+
+[//]: # (capture: baremetal)
+
+```sh
+cd $WORKSPACE/src
+```
+
+_Command to run the real-time inference using Intel® PyTorch\*_
+
+```sh
+python pytorch_evaluation.py -d $DATA_DIR -m $OUTPUT_DIR/{trained_model.h5} -b 1
+
+```
+
+Using model from previous steps:
+
+[//]: # (capture: baremetal)
+
+```sh
+python pytorch_evaluation.py -d $DATA_DIR -m $OUTPUT_DIR/pill_intel_model.h5 -b 1
+```
+
+> By using different batchsize one can observe the gain obtained using Intel® Extension for PyTorch\*
+
+### 3. Quantize trained models using Intel® Neural Compressor
+
+Intel® Neural Compressor is used to quantize the FP32 Model to the INT8 Model. Optimzied model is used here for evaluating and timing Analysis.
+Intel® Neural Compressor supports many optimization methods. In this case, we used post training quantization with `Accuracy aware mode` method to quantize the FP32 model.
+
+_Step-1: Conversion of FP32 Model to INT8 Model_
+
+```
+usage: neural_compressor_conversion.py [-h] [-d DATAPATH] [-m MODELPATH]
+                                       [-c CONFIG] [-o OUTPATH]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -d DATAPATH, --datapath DATAPATH
+                        dataset path which consists of train and test folders
+  -m MODELPATH, --modelpath MODELPATH
+                        Model path trained with PyTorch* ".h5" file
+  -c CONFIG, --config CONFIG
+                        Yaml file for quantizing model, default is
+                        "./config.yaml"
+  -o OUTPATH, --outpath OUTPATH
+                        default output quantized model will be save in
+                        ./output folder
+```
+
+_Command to run the neural_compressor_conversion_
+
+```sh
+cd $WORKSPACE/src/intel_neural_compressor
+python neural_compressor_conversion.py -d $DATA_DIR -m $OUTPUT_DIR/{trained_model.h5} -o $OUTPUT_DIR
+```
+
+Using model from previous steps:
+
+[//]: # (capture: baremetal)
+
+```sh
+cd $WORKSPACE/src/intel_neural_compressor
+python neural_compressor_conversion.py -d $DATA_DIR -m $OUTPUT_DIR/pill_intel_model.h5 -o $OUTPUT_DIR
+```
+
+> Quantized model will be saved by default in `OUTPUT_DIR` folder
+
+_Step-2: Inferencing using quantized Model_
+
+```
+usage: neural_compressor_inference.py [-h] [-d DATAPATH] [-fp32 FP32MODELPATH]
+                                      [-c CONFIG] [-int8 INT8MODELPATH]
+
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -d DATAPATH, --datapath DATAPATH
+                        dataset path which consists of train and test folders
+  -fp32 FP32MODELPATH, --fp32modelpath FP32MODELPATH
+                        Model path trained with PyTorch* ".h5" file
+  -c CONFIG, --config CONFIG
+                        Yaml file for quantizing model, default is
+                        "./config.yaml"
+  -int8 INT8MODELPATH, --int8modelpath INT8MODELPATH
+                        load the quantized model folder. default is ./output
+                        folder
+```
+
+_Command to run neural_compressor_inference for realtime `(batchsize =1)`_
+
+```sh
+cd $WORKSPACE/src/intel_neural_compressor
+python neural_compressor_inference.py -d $DATA_DIR -fp32 $OUTPUT_DIR/{trained_model.h5}  -int8 $OUTPUT_DIR -b 1
+```
+
+Using model from previous steps:
+
+[//]: # (capture: baremetal)
+
+```sh
+cd $WORKSPACE/src/intel_neural_compressor
+python neural_compressor_inference.py -d $DATA_DIR -fp32 $OUTPUT_DIR/pill_intel_model.h5 -int8 $OUTPUT_DIR -b 1
+```
+
+> Use `-b` to test with different batch size (e.g. `-b 10`)
+
+### Clean Up Bare Metal
+
+Follow these steps to restore your `$WORKSPACE` directory to an initial step. Please note that all downloaded dataset files, conda environment, and logs created by workflow will be deleted. Before executing next steps back up your important files.
+
+[//]: # (capture: baremetal)
+
+```bash
+conda deactivate
+conda env remove -n visual_inspection_intel
+rm -rf $DATA_DIR/*
+rm -rf $OUTPUT_DIR/*
+```
+
+Remove repository
+
+[//]: # (capture: baremetal)
+
+```sh
+rm -rf $WORKSPACE
+```
+
+## Run Using Docker
+
+Follow these instructions to set up and run our provided Docker image. For running on bare metal, see the [bare metal](#run-using-bare-metal) instructions.
+
+### 1. Set Up Docker Engine and Docker Compose
+
+You'll need to install Docker Engine on your development system. Note that while **Docker Engine** is free to use, **Docker Desktop** may require you to purchase a license. See the [Docker Engine Server installation instructions](https://docs.docker.com/engine/install/#server) for details.
+
+To build and run this workload inside a Docker Container, ensure you have Docker Compose installed on your machine. If you don't have this tool installed, consult the official [Docker Compose installation documentation](https://docs.docker.com/compose/install/linux/#install-the-plugin-manually).
+
+```sh
+DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
+mkdir -p $DOCKER_CONFIG/cli-plugins
+curl -SL https://github.com/docker/compose/releases/download/v2.7.0/docker-compose-linux-x86_64 -o $DOCKER_CONFIG/cli-plugins/docker-compose
+chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
+docker compose version
+```
+
+### 2. Install Workflow Packages
+
+Ensure you have completed steps in the [Get Started Section](#get-started).
+
+### 3. Set Up Docker Image
+
+Build the provided docker image.
+
+```bash
+cd $WORKSPACE/docker
+chmod 777 -R $DATA_DIR
+docker compose build
+```
+
+### 4. Preprocess Dataset with Docker Compose
+
+Prepare dataset for Anomaly Detection workflows and accept the legal agreement to use the Intel® Model Zoo Dataset Librarian.
+
+```sh
+cd $WORKSPACE/docker
+USER_CONSENT=y docker compose run preprocess
+```
+
+| Environment Variable Name | Default Value       | Description                |
+| ------------------------- | ------------------- | -------------------------- |
+| WORKSPACE                 | `/workspace`        | workspace directory        |
+| OUTPUT_DIR                | `/workspace/output` | output directory           |
+| DATA_DIR                  | `/workspace/data`   | dataset directory          |
+| USER_CONSENT              | yes                 | Consent to legal agreement |
+
+### 5. Run Docker Image in an Interactive Environment
+
+If your environment requires a proxy to access the internet, export your development system's proxy settings to the docker environment:
+
+```sh
+export DOCKER_RUN_ENVS="-e ftp_proxy=${ftp_proxy} \
+  -e FTP_PROXY=${FTP_PROXY} -e http_proxy=${http_proxy} \
+  -e HTTP_PROXY=${HTTP_PROXY} -e https_proxy=${https_proxy} \
+  -e HTTPS_PROXY=${HTTPS_PROXY} -e no_proxy=${no_proxy} \
+  -e NO_PROXY=${NO_PROXY} -e socks_proxy=${socks_proxy} \
+  -e SOCKS_PROXY=${SOCKS_PROXY}"
+```
+
+Run the workflow with the `docker run` command, as shown:
+
+```sh
+docker run -a stdout ${DOCKER_RUN_ENVS} \
+           -v /${DATA_DIR}:/workspace/data \
+           --device=/dev/dri --init -it --rm \
+           intel/ai-workflows:apollo-anomaly-detection \
+           bash
+```
+
+Define an environment variable that will store the workspace path inside container.
+
+```sh
+export WORKSPACE=/workspace
+export DATA_DIR=$WORKSPACE/data
+export OUTPUT_DIR=$WORKSPACE/output
+```
+
+Run the command below for training without data augmentation and hyperparameter tuning inside container:
+
+```sh
+cd $WORKSPACE/src
+python training.py -d $DATA_DIR -o $OUTPUT_DIR/pill_intel_model.h5
+```
+
+You can follow steps 1, 2 and 3 in the [Run Bare Metal](#run-using-bare-metal) section.
+
+### 7. Clean Up Docker Containers
+
+Stop containers created by docker compose and remove them.
+
+```bash
+docker compose down
+```
+
+## Expected Outputs
+
+### Expected Output for training without data augmentation and hyperparameter tuning
+
+Below output would be generated by the training module which will capture the overall training time.
+
 ```
 Dataset path Found!!
 Train and Test Data folders Found!
@@ -222,274 +596,91 @@ train_time= 1094.215266942978
 The line containing `train_time` gives the time required for the training the model.
 Run this script to record multiple trials and the average can be calculated.
 
-### 4. Inference
-#### Running inference using Pytorch
-Use the following commands to run the inference on test images and get the inference timing for each batch of images.<br>
+### Expected Output for Inferencing using quantized Model
+
+Below output would be generated by the Inferencing using quantized Model with neural compressor.
 
 ```
-usage: pytorch_evaluation.py [-h] [-d DATA_FOLDER] [-m MODEL_PATH] [-i INTEL] [-b BATCHSIZE]
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -d DATA_FOLDER, --data_folder DATA_FOLDER
-                        dataset path which consists of train and test folders
-  -m MODEL_PATH, --model_path MODEL_PATH
-                        Absolute path to the h5 pytorch model with extension ".h5"
-  -i INTEL, --intel INTEL
-                        use 1 for enabling intel pytorch optimizations, default is 0
-  -b BATCHSIZE, --batchsize BATCHSIZE
-                        use the batchsize that want do inference, default is 1
+Batch Size used here is  1
+Average Inference Time Taken Fp32 -->  0.035616397857666016
+Average Inference Time Taken Int8 -->  0.011458873748779297
+**************************************************
+Evaluating the Quantizaed Model
+**************************************************
+2023-07-04 05:59:42 [WARNING] Force convert framework model to neural_compressor model.
+2023-07-04 05:59:42 [INFO] Start to run Benchmark.
+2023-07-04 05:59:49 [INFO]
+accuracy mode benchmark result:
+2023-07-04 05:59:49 [INFO] Batch size = 1
+2023-07-04 05:59:49 [INFO] Accuracy is 0.9595
+**************************************************
+Evaluating the FP32 Model
+**************************************************
+2023-07-04 05:59:49 [WARNING] Force convert framework model to neural_compressor model.
+2023-07-04 05:59:49 [INFO] Start to run Benchmark.
+2023-07-04 05:59:59 [INFO]
+accuracy mode benchmark result:
+2023-07-04 05:59:59 [INFO] Batch size = 1
+2023-07-04 05:59:59 [INFO] Accuracy is 0.9595
 ```
 
-*Command to run real-time inference using stock PyTorch*
-```sh
-python pytorch_evaluation.py -d ../data -m ./{trained_model.h5} -b 1
-```
+## Summary and Next Steps
 
-*Command to run the real-time inference using Intel Pytorch*
-```sh
-python pytorch_evaluation.py -d ../data -m ./{trained_model.h5} -b 1 -i 1
-```
+Intel® Extension for PyTorch\* v2.0.110
 
-> By using different batchsize one can observe the gain obtained using Intel® Extension for PyTorch
-  
+- The reference use case above demonstrates an Anomaly Detection approach using a convolutional neural network. For optimal performance on Intel architecture, the scripts are also enabled with Intel extension for PyTorch\*, Intel extension for scikit-learn and Intel® Neural Compressor.
 
-### 5. Quantize trained models using Intel® Neural Compressor
-Intel® Neural Compressor is used to quantize the FP32 Model to the INT8 Model. Optimzied model is used here for evaluating and timing Analysis.
-Intel® Neural Compressor supports many optimization methods. In this case, we used post training quantization with `Accuracy aware mode` method to quantize the FP32 model.
+#### Adopt to your dataset
 
-*Step-1: Conversion of FP32 Model to INT8 Model*
+This reference use case can be easily deployed on a different or customized dataset by simply arranging the images for training and testing in the following folder structure (Note: this approach only uses good images for training):
 
-```
-usage: neural_compressor_conversion.py [-h] [-d DATAPATH] [-m MODELPATH]
-                                       [-c CONFIG] [-o OUTPATH] [-i INTEL]
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -d DATAPATH, --datapath DATAPATH
-                        dataset path which consists of train and test folders
-  -m MODELPATH, --modelpath MODELPATH
-                        Model path trained with pytorch ".h5" file
-  -c CONFIG, --config CONFIG
-                        Yaml file for quantizing model, default is
-                        "./config.yaml"
-  -o OUTPATH, --outpath OUTPATH
-                        default output quantized model will be save in
-                        ./output folder
-```
-
-*Command to run the neural_compressor_conversion*
-> Activate stock Environment before running
-```
-cd intel_neural_compressor
-python neural_compressor_conversion.py -d ../../data/ -m ../{trained_model.h5} 
-```
-> Quantized model will be saved by default in `output` folder
-
-
-*Step-2: Inferencing using quantized Model*
-```
-usage: neural_compressor_inference.py [-h] [-d DATAPATH] [-fp32 FP32MODELPATH]
-                                      [-c CONFIG] [-int8 INT8MODELPATH]
-                                      [-i INTEL]
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -d DATAPATH, --datapath DATAPATH
-                        dataset path which consists of train and test folders
-  -fp32 FP32MODELPATH, --fp32modelpath FP32MODELPATH
-                        Model path trained with pytorch ".h5" file
-  -c CONFIG, --config CONFIG
-                        Yaml file for quantizing model, default is
-                        "./config.yaml"
-  -int8 INT8MODELPATH, --int8modelpath INT8MODELPATH
-                        load the quantized model folder. default is ./output
-                        folder
-```
-
-*Command to run neural_compressor_inference for realtime `(batchsize =1)`*
-```
-python neural_compressor_inference.py -d ../../data/ -fp32 ../{trained_model.h5}  -int8 ./output -b 1
-```
-> Use `-b` to test with different batch size (e.g. `-b 10`)
-  
-
-### 6. Quantize trained models using Intel® Distribution of OpenVINO
-When it comes to the deployment of this model on Edge devices, with less computing and memory resources, we further need to explore options for quantizing and compressing the model which brings out the same level of accuracy and efficient utilization of underlying computing resources. Intel® Distribution of OpenVINO™ Toolkit facilitates the optimization of a deep learning model from a framework and deployment using an inference engine on such computing platforms based on Intel hardware accelerators. Below section covers the steps to use this toolkit for the model quantization and measure its performance.  
-  
-**Setting up the environment for OpenVINO**<br>Follow the below conda installation commands to setup the OpenVINO environment. 
-```sh
-conda env create -f env/openvino_pot/openvino.yml
-```
-*Activate OpenVINO environment*
-Use the following command to activate the environment that was created:
-```sh
-conda activate openvino
-```
-
-**OpenVINO Intermediate Representation (IR) conversion** <br>
-Below are the steps to onvert ONNX model representation to OpenVINO IR using OpenVINO model converter.
-
-*Pre-requisites*  
-- ONNX model should be generated using `training.py` without enabling hyperparameter tuning.
-
-```sh
-mo --input_model <trained pill onnx model> --output_dir <output directory>
-```
-
-> The above step will generate `<model-name>.bin` and `<model-name>.xml` as output which can be used with OpenVINO inference application. Default precision is FP32.
-  
-
-**Running inference using OpenVINO**<br>Command to perform inference using OpenVINO. The model need to be converted to IR format as per the section OpenVINO IR conversion. 
-
-> *Note*<br>This module is based on the hello_classification python module from the OpenVINO package.
-
-```
-usage: python src/intel_openvino/openvino_inference.py -m MODEL -i INPUT [-d DEVICE] [--labels LABELS] [-nt NUMBER_TOP]
-
-Options:
-  -h, --help            Show this help message and exit.
-  -m MODEL, --model MODEL
-                        Required. Path to an .xml or .onnx file with a trained model.
-  -i INPUT, --input INPUT
-                        Required. Path to an image file(s).
-  -d DEVICE, --device DEVICE
-                        Optional. Specify the target device to infer on; CPU, GPU, MYRIAD, HDDL or HETERO: is acceptable. The sample will look for a suitable plugin for device specified. Default value is CPU.
-  --labels LABELS       Optional. Path to a labels mapping file.
-  -nt NUMBER_TOP, --number_top NUMBER_TOP
-                        Optional. Number of top results.
-```
-*Sample output*
-```
-[ INFO ] Image path: /pill_detection/pill/test/good/018.png Inference time 0.0390775203704834 secs
-[ INFO ] Image path: /pill_detection/pill/test/good/016.png Inference time 0.01861429214477539 secs
-[ INFO ] Image path: /pill_detection/pill/test/good/017.png Inference time 0.017536640167236328 secs
-[ INFO ] Image path: /pill_detection/pill/test/good/003.png Inference time 0.01746678352355957 secs
-[ INFO ] Image path: /pill_detection/pill/test/good/004.png Inference time 0.017514705657958984 secs
-[ INFO ] Image path: /pill_detection/pill/test/good/025.png Inference time 0.01749396324157715 secs
-[ INFO ] Image path: /pill_detection/pill/test/good/014.png Inference time 0.017452716827392578 secs
-```
-
-#### Benchmarking with OpenVINO Post-Training Optimization Tool
-Post-training Optimization Tool (POT) is designed to accelerate the inference of deep learning models by applying special methods without model retraining or fine-tuning, like post-training quantization.
-
-*Pre-requisites*
-- Intel® Distribution of OpenVINO™ Toolkit
-- OpenVINO IR converted FP32/16 precision model
-- Dataset for validation
-
-*High level flow for the quantization model conversion and benchmarking*
-![image](assets/openvino_pot_flow.png)
-
-**Performance Benchmarking of full precision (FP32) Model**<br>
-
-> Activate OpenVINO environment before running  
-  
-
-Use the below command to run the benchmark tool for the ONNX model generated using this codebase for the pill anamoly detection. 
-
-```sh
-benchmark_app -m pill_intel_model.onnx
-```
-
-Use the below command to run the benchmark tool for the OpenVINO IR model generated using this codebase for the pill anamoly detection. 
-```sh
-benchmark_app -m pill_intel_model.xml -api async -niter 120 -nireq 1 -b <batch_size> -nstreams 1 -nthreads <number_of_cpu_cores>
-```
-
-#### Model Quantization
-**Configurations**<br>Below are the configurations which needs to be modified prior to run this postraining optimization tool.
-
-- `env/openvino_pot/pill_intel_model_int8.json` DefaultQuantization Configuration - Update `model`, `weights` and `config` according to the appropriate file location
-- `env/openvino_pot/pill_intel_model_int8_acc.json` AccuracyAwareQuantization Configuration - Update `model`, `weights` and `config` according to the appropriate file location
-- `env/openvino_pot/pill_intel_model.yml` Dataconverter Configuration - Update 'data_source' and 'data_dir' to the dataset folder location
-
-> **Note**<br>The data converter used in this codebase is 'cls_dataset_folder' hence the test dataset to be used for the quantization conversion needs to follow the below directory structure.
-
-```
-  data
-    |
-    |-- test
-      |-- bad
-      |   |--- <Image files labelled as BAD>
-      |-- good
-      |   |--- <Image files labelled as GOOD>
-```
-
-*DefaultQuantization* : `env/openvino_pot/pill_intel_model_int8.json`
-*AccuracyAwareQuantization* : `env/openvino_pot/pill_intel_model_int8_acc.json`
-
-> **Note**<br>These json files contains paths of FP32 IR model
-
-Use the below command to quantize the model as per the requirement. 
-```sh
-pot -c env/openvino_pot/pill_intel_model_int8.json -e
-```
-
-> When this tool execution completes successfully, it generates a folder structure with the name `results` where the quantized model files will be placed.
-
-##### Performance Benchmarking of Quantized (INT8) Model
-Use the below command to run the benchmark tool for the Quantized OpenVINO IR model generated using the steps given in the previous section.
-
-```sh
-benchmark_app -m results/<path_to_the_quantized_model/pill_intel_model.xml -api async -niter 120 -nireq 1 -b <batch_size> -nstreams 1 -nthreads <number_of_cpu_cores>
-```
-
-### 7. Observations
-This section covers the prediction time comparison between Stock PyTorch 1.8.0 and Intel PyTorch Extension 1.8.0 for this model.
-
-![image](assets/pytorch_prediction_time.png)
-<br>**Key Takeaways**
-- Realtime prediction time speedup with Intel® Extension for PyTorch 1.8.0 shows up to 2.22x against stock Pytorch 1.8.0 for the Pill anomaly detection model
-- Batch prediction time speedup with Intel® Extension for PyTorch 1.8.0 shows from 1.04x to 1.38x against stock Pytorch 1.8.0 for the Pill anomaly detection model
-
-#### Intel Neural Compressor
-Below are the observations on the inference timing on the quantized model created using Intel® Neural Compressor(INC) on Azure Standard_D4_V5 instance.
-
-![image](assets/INC_d4v5_inference.png)
-<br>**Key Takeaways**
-- Realtime prediction time speedup with Stock Pytorch 1.8.0 INC INT8 quantized Pill anomaly detection model shows up to 8.15x against Stock Pytorch 1.8.0 FP32 model
-- Batch prediction time speedup with Stock Pytorch 1.8.0 INC INT8 quantized Pill anomaly detection model shows from 3.18x  to 4.54x against Stock Pytorch 1.8.0 FP32 model
-
-> Gain obtained here is purely with Intel® Neural Compressor(INC) quantized model without any Intel® Extension for PyTorch optimizations.<br>There is only 0.001% Accuracy drop observed post quantization of FP32 model in both phases.
-
-#### OpenVINO Post-Training Optimization Tool
-This section covers the benchmarking observations using the pre and post quantized model using OpenVINO Post-Training Optimization Tool .
-
-> **Note** Prediction time for the OpenVINO models have been taken using OpenVINO benchmarking application in Latency mode with the parameters `-api async -niter 120 -nireq 1 -b 1<batch_size> -nstreams 1 -nthreads <number_of_cpu_cores>`
-
-![image](assets/openvino_pot_benchmark.png)
-<br>**Key Takeaways**
-- Realtime prediction time speedup with OpenVINO FP32 Pill anomaly detection model shows up to 2.74x against Stock Pytorch 1.8.0 FP32 model
-- Realtime prediction time speedup with OpenVINO INT8 quantized Pill anomaly detection model shows up to 13.16x against Stock Pytorch 1.8.0 FP32 model
-- Batch prediction time speedup with OpenVINO FP32 Pill anomaly detection model shows from 1.11x  to 1.59x against Stock Pytorch 1.8.0 FP32 model
-- Batch prediction time speedup with OpenVINO INT8 quantized Pill anomaly detection model shows from 5x  to 6.9x against Stock Pytorch 1.8.0 FP32 model
-
-> There is only 0.001% Accuracy drop observed post quantization of FP32 model in both realtime and batch prediction.
+![adapt_dataset](assets/adapt_dataset.png)
 
 #### Conclusion
-With the arrival of computer vision (CV) techniques, powered by AI and deep learning, visual inspection has been digitalized and automated. Factories have installed cameras in each production line and huge quantities of images are read and processed using a deep learning model trained for defect detection. If each production line will have its CV application running on the edge to train that can show the scale of the challenge this industry faces with automation. CV applications demand, however, huge amounts of processing power to process the increasing image load, requiring a trade-off between accuracy, inference performance, and compute cost. Manufacturers will look for easy and cost-effective ways to deploy computer vision applications across edge-cloud infrastructures to balance the cost without impacting accuracy and inference performance. This reference kit implementation provides performance-optimized guide around quality visual inspection use cases that can be easily scaled across similar use cases.
+
+With the arrival of computer vision (CV) techniques, powered by Artificial Intelligence (AI) and deep learning, visual inspection has been digitalized and automated. Factories have installed cameras in each production line and huge quantities of images are read and processed using a deep learning model trained for defect detection. If each production line will have its CV application running on the edge to train that can show the scale of the challenge this industry faces with automation. CV applications demand, however, huge amounts of processing power to process the increasing image load, requiring a trade-off between accuracy, inference performance, and compute cost. Manufacturers will look for easy and cost-effective ways to deploy computer vision applications across edge-cloud infrastructures to balance the cost without impacting accuracy and inference performance. This reference kit implementation provides performance-optimized guide around quality visual inspection use cases that can be easily scaled across similar use cases.
+
+## Learn More
+
+For more information about <workflow> or to read about other relevant workflow
+examples, see these guides and software resources:
+
+- [Intel® AI Analytics Toolkit (AI Kit)](https://www.intel.com/content/www/us/en/developer/tools/oneapi/ai-analytics-toolkit.html)
+- [Developer Catalog](https://developer.intel.com/aireferenceimplementations)
+- [Intel® Distribution for Python\*](https://www.intel.com/content/www/us/en/developer/tools/oneapi/distribution-for-python.html#gs.52te4z)
+- [Intel® Extension for PyTorch\*](https://github.com/intel/intel-extension-for-pytorch)
+- [Intel® Neural Compressor\*](https://github.com/intel/neural-compressor)
+
+## Support
+
+If you have any questions with this workflow, want help with troubleshooting, want to report a bug or submit enhancement requests, please submit a GitHub issue.
 
 ## Appendix
 
-### **Running on Windows**
+### References
 
-The reference kits commands are linux based, in order to run this on Windows, goto Start and open WSL and follow the same steps as running on a linux machine starting from git clone instructions. If WSL is not installed you can [install WSL](https://learn.microsoft.com/en-us/windows/wsl/install).
+<a id="mvtec_ad_dataset">[1]</a> GmbH, M. (2023). MVTec Anomaly Detection Dataset: MVTec Software. Retrieved 5 September 2023, from https://www.mvtec.com/company/research/datasets/mvtec-ad
 
-> **Note** If WSL is installed and not opening, goto Start ---> Turn Windows feature on or off and make sure Windows Subsystem for Linux is checked. Restart the system after enabling it for the changes to reflect.
+<a id="case_study">[2]</a> Explainable Defect Detection Using Convolutional Neural Networks: Case Study. (2022). Retrieved 5 September 2023, from https://towardsdatascience.com/explainable-defect-detection-using-convolutional-neural-networks-case-study-284e57337b59
 
-## Notices & Disclaimers
-Performance varies by use, configuration, and other factors. Learn more on the [Performance Index site](https://edc.intel.com/content/www/us/en/products/performance/benchmarks/overview/). 
-Performance results are based on testing as of dates shown in configurations and may not reflect all publicly available updates.  See backup for configuration details.  No product or component can be absolutely secure. 
-Your costs and results may vary. 
+<a id="vgg">[3]</a> GitHub - OlgaChernytska/Visual-Inspection: Explainable Defect Detection using Convolutional Neural Networks: Case Study. (2023). Retrieved 5 September 2023, from https://github.com/OlgaChernytska/Visual-Inspection
+
+<a id="mvtec_ad">[4]</a> Bergmann, P., Fauser, M., Sattlegger, D., & Steger, C. (2019). [MVTec AD--A comprehensive real-world dataset for unsupervised anomaly detection](https://www.mvtec.com/fileadmin/Redaktion/mvtec.com/company/research/datasets/mvtec_ad.pdf). In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition (pp. 9592-9600).
+
+
+### Notices & Disclaimers
+
+<a id="legal_disclaimer"></a>
+
+Please see this data set's applicable license for terms and conditions. Intel®Corporation does not own the rights to this data set and does not confer any rights to it.
+
+\*Other names and brands that may be claimed as the property of others. [Trademarks](https://www.intel.com/content/www/us/en/legal/trademarks.html).
+
+Performance varies by use, configuration, and other factors. Learn more on the [Performance Index site](https://edc.intel.com/content/www/us/en/products/performance/benchmarks/overview/).
+
+Performance results are based on testing as of dates shown in configurations and may not reflect all publicly available updates. See backup for configuration details. No product or component can be absolutely secure.
+Your costs and results may vary.
+
 Intel technologies may require enabled hardware, software, or service activation.
-© Intel Corporation.  Intel, the Intel logo, and other Intel marks are trademarks of Intel Corporation or its subsidiaries.  Other names and brands may be claimed as the property of others.  
 
-## Appendix
-
-**Date Testing Performed**: July 2022 
-
-**Configuration Details and Workload Setup**: Azure Standard_D4_v5 (Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz), 1 Socket, 2 Cores per Socket, 2 Threads per Core, Turbo: On, 16 GB total memory, Ubuntu 20.04.4 LTS, Kernel: Linux 5.13.0-1025-azure x86_64,
-Framework/Toolkit incl version for Stock: Python 1.8.0, Framework/Toolkit incl version for Intel: Intel® Extension for PyTorch 1.8.0,Intel® Neural Compressor 1.12, ML algorithm: VGG16, Dataset: Pill Data Image Dataset with ~300 Samples, Precision: FP32, INT8
-
-**Testing performed by** Intel Corporation
+© Intel Corporation. Intel, the Intel logo, and other Intel marks are trademarks of Intel Corporation or its subsidiaries. Other names and brands may be claimed as the property of others.

@@ -4,12 +4,15 @@ run-name: "Bandit Scan"
 on: [push]
 
 jobs:
-  bandit:
+  bandit_job:
+    runs-on: [self-hosted, Linux]
     name: Bandit
-    runs-on: self-hosted
+    container:
+      # python:slim includes both Python3 and Bash
+      image: cache-registry.caas.intel.com/cache/library/python:slim
     steps:
-      - uses: actions/checkout@v3
-      - name: Scan
-        uses: intel-innersource/frameworks.devops.github.actions.bandit@main
-        with:
-          scan_path: src
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Run Bandit
+        id: bandit
+        uses: intel-innersource/frameworks.actions.bandit@v1.3

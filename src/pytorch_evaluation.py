@@ -33,12 +33,6 @@ if __name__ == "__main__":
                         required=False,
                         default='weights/pill_intel_model.h5',
                         help='Absolute path to the h5 pytorch model with extension ".h5"')
-    parser.add_argument('-i',
-                        '--intel',
-                        type=int,
-                        required=False,
-                        default=0,
-                        help='use 1 for enabling intel pytorch optimizations, default is 0')
     parser.add_argument('-b',
                         '--batchsize',
                         type=int,
@@ -49,7 +43,6 @@ if __name__ == "__main__":
 
     data_folder = FLAGS.data_folder
     model_path = FLAGS.model_path
-    intel_flag = FLAGS.intel
     batch_size = FLAGS.batchsize
 
     # Handle Exceptions for the user entries
@@ -71,9 +64,8 @@ if __name__ == "__main__":
         sys.exit()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    if intel_flag:
-        import intel_extension_for_pytorch as ipex
-        DEVICE = "cpu"
+    import intel_extension_for_pytorch as ipex
+    DEVICE = "cpu"
     # Load dataset
     start_time = time.time()
     train_loader, test_loader = get_train_test_loaders(

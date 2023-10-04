@@ -12,7 +12,6 @@
 #
 # Model can be saved in 2 formats
 # 1 - pytorch (.h5 ot .pth)
-# 2 - onnx (directly supported for openvino IR conversion)
 """System module."""
 # pylint: disable=E1101,E1102,E0401,R0914,R0801
 import os
@@ -114,19 +113,12 @@ if __name__ == "__main__":
                         required=False,
                         default=0,
                         help='use 1 for enabling hyperparameter tuning, default is 0')
-    parser.add_argument('-i',
-                        '--intel',
-                        type=int,
-                        required=False,
-                        default=0,
-                        help='use 1 for enabling intel pytorch optimizations, default is 0')
     FLAGS = parser.parse_args()
 
     data_folder = FLAGS.datapath
     subset_name = FLAGS.outmodel
     data_aug = FLAGS.dataaug
     hyperparams = FLAGS.hyperparams
-    intel_flag = FLAGS.intel
 
     # Handle Exceptions for the user entries
     try:
@@ -150,10 +142,9 @@ if __name__ == "__main__":
     EPOCHS = 1
     class_weight = [1, 3] if NEG_CLASS == 1 else [3, 1]
     DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    if intel_flag:
-        import intel_extension_for_pytorch as ipex
-        DEVICE = "cpu"
 
+    import intel_extension_for_pytorch as ipex
+    DEVICE = "cpu"
     HEATMAP_THRESH = 0.7
     N_CV_FOLDS = 3
 
@@ -171,7 +162,8 @@ if __name__ == "__main__":
     # Model Training
     # Intitalization of DL architechture along with optimizer and loss function
     model = CustomVGG()
-    class_weight = torch.tensor(class_weight).type(torch.FloatTensor).to(DEVICE)
+    class_weight = torch.tensor(class_weight).type(
+        torch.FloatTensor).to(DEVICE)
     criterion = nn.CrossEntropyLoss(weight=class_weight)
     optimizer = optim.Adam(model.parameters(), lr=LR)
 
@@ -183,11 +175,8 @@ if __name__ == "__main__":
     train_time = time.time()-start_time
 
     # Model Saving
-    model_path = f"{subset_name}_model.h5"
+    model_path = f"{subset_name}"
     torch.save(model, model_path)
-    if not intel_flag:
-        dummy_input = Variable(torch.randn(1, 3, 224, 224))
-        torch.onnx.export(model, dummy_input, f"{subset_name}_model.onnx")
 
     print('train_time=', train_time)
 
