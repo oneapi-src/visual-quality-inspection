@@ -1,3 +1,6 @@
+# Copyright (C) 2023 Intel Corporation
+# SPDX-License-Identifier: BSD-3-Clause
+
 #! /bin/bash
 echo $USER_CONSENT | python -m dataset_librarian.dataset -n mvtec-ad --download --preprocess -d /workspace/data
 mkdir -p /workspace/data/{train/{good,bad},test/{good,bad}} 
