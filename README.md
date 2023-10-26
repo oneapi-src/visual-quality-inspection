@@ -1,4 +1,4 @@
-# Quality Visual Inspection
+# Visual Quality Inspection
 
 ## Introduction
 
