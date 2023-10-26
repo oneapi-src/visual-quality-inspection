@@ -7,7 +7,6 @@ FROM ${IMAGE_NAME}:${IMAGE_TAG}
 RUN apt-get update \
     && apt-get install -y --fix-missing --no-install-recommends \
     wget \
-    xz-utils \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -35,5 +34,5 @@ ENV PATH="${CONDA_PREFIX}/bin:${CONDA_INSTALL_PATH}/bin:${PATH}"
 # Conda tools
 RUN conda config --set solver libmamba \
     && conda env create -f /workspace/env/intel_env.yml \
-    && conda create -n notebook_env jupyterlab nb_conda_kernels ipykernel -q -y
+    && conda create -n notebook_env jupyterlab nb_conda_kernels -q -y
 
