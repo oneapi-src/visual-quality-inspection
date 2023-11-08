@@ -17,7 +17,6 @@ Check out more workflow examples and reference implementations in the [Developer
   - [Download the Workflow Repository](#Download-the-Workflow-Repository)
 - [Ways to run this reference use case](#Ways-to-run-this-reference-use-case)
   - [Run Using Bare Metal](#run-using-bare-metal)
-  - [Run Using Docker](#run-using-docker)
 - [Expected Output](#expected-output)
 - [Summary and Next Steps](#summary-and-next-steps)
   - [Adopt to your dataset](#adopt-to-your-dataset)
@@ -75,7 +74,7 @@ Table 1: Statistical overview of the MVTec AD dataset. For each category, the nu
 
 ## Validated Hardware Details
 
-There are workflow-specific hardware and software setup requirements depending on how the workflow is run. Bare metal development system and Docker\* image running locally have the same system requirements.
+There are workflow-specific hardware and software setup requirements.
 
 | Recommended Hardware                                            | Precision  |
 | --------------------------------------------------------------- | ---------- |
@@ -243,18 +242,15 @@ python clone_dataset.py -d $DATA_DIR
 
 ### Supported Runtime Environment
 
-This reference kit offers two options for running the fine-tuning and inference processes:
+This reference kit offers one options for running the fine-tuning and inference processes:
 
 - [Bare Metal](#run-using-bare-metal)
-- [Docker](#run-using-docker)
-
-Details about each of these methods can be found below. Keep in mind that each method must be executed in a separate environment from each other. If you run first Docker Compose and then bare metal, this will cause issues.
 
 > **Note**: The performance were tested on Xeon based processors. Some portions of the ref kits may run slower on a client machine, so utilize the flags supported to modify the epochs/batch size to run the training or inference faster.
 
 ## Run Using Bare Metal
 
-> **Note**: Follow these instructions to set up and run this workflow on your own development system. For running a provided Docker image with Docker, see the [Docker instructions](#run-using-docker).
+> **Note**: Follow these instructions to set up and run this workflow on your own development system.
 
 ### Set Up and run Workflow
 
@@ -471,102 +467,6 @@ Remove repository
 
 ```sh
 rm -rf $WORKSPACE
-```
-
-## Run Using Docker
-
-Follow these instructions to set up and run our provided Docker image. For running on bare metal, see the [bare metal](#run-using-bare-metal) instructions.
-
-### 1. Set Up Docker Engine and Docker Compose
-
-You'll need to install Docker Engine on your development system. Note that while **Docker Engine** is free to use, **Docker Desktop** may require you to purchase a license. See the [Docker Engine Server installation instructions](https://docs.docker.com/engine/install/#server) for details.
-
-To build and run this workload inside a Docker Container, ensure you have Docker Compose installed on your machine. If you don't have this tool installed, consult the official [Docker Compose installation documentation](https://docs.docker.com/compose/install/linux/#install-the-plugin-manually).
-
-```sh
-DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
-mkdir -p $DOCKER_CONFIG/cli-plugins
-curl -SL https://github.com/docker/compose/releases/download/v2.7.0/docker-compose-linux-x86_64 -o $DOCKER_CONFIG/cli-plugins/docker-compose
-chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
-docker compose version
-```
-
-### 2. Install Workflow Packages
-
-Ensure you have completed steps in the [Get Started Section](#get-started).
-
-### 3. Set Up Docker Image
-
-Build the provided docker image.
-
-```bash
-cd $WORKSPACE/docker
-chmod 777 -R $DATA_DIR
-docker compose build
-```
-
-### 4. Preprocess Dataset with Docker Compose
-
-Prepare dataset for Anomaly Detection workflows and accept the legal agreement to use the Intel® Model Zoo Dataset Librarian.
-
-```sh
-cd $WORKSPACE/docker
-USER_CONSENT=y docker compose run preprocess
-```
-
-| Environment Variable Name | Default Value       | Description                |
-| ------------------------- | ------------------- | -------------------------- |
-| WORKSPACE                 | `/workspace`        | workspace directory        |
-| OUTPUT_DIR                | `/workspace/output` | output directory           |
-| DATA_DIR                  | `/workspace/data`   | dataset directory          |
-| USER_CONSENT              | yes                 | Consent to legal agreement |
-
-### 5. Run Docker Image in an Interactive Environment
-
-If your environment requires a proxy to access the internet, export your development system's proxy settings to the docker environment:
-
-```sh
-export DOCKER_RUN_ENVS="-e ftp_proxy=${ftp_proxy} \
-  -e FTP_PROXY=${FTP_PROXY} -e http_proxy=${http_proxy} \
-  -e HTTP_PROXY=${HTTP_PROXY} -e https_proxy=${https_proxy} \
-  -e HTTPS_PROXY=${HTTPS_PROXY} -e no_proxy=${no_proxy} \
-  -e NO_PROXY=${NO_PROXY} -e socks_proxy=${socks_proxy} \
-  -e SOCKS_PROXY=${SOCKS_PROXY}"
-```
-
-Run the workflow with the `docker run` command, as shown:
-
-```sh
-docker run -a stdout ${DOCKER_RUN_ENVS} \
-           -v /${DATA_DIR}:/workspace/data \
-           --device=/dev/dri --init -it --rm \
-           intel/ai-workflows:apollo-anomaly-detection \
-           bash
-```
-
-Define an environment variable that will store the workspace path inside container.
-
-```sh
-export WORKSPACE=/workspace
-export DATA_DIR=$WORKSPACE/data
-export OUTPUT_DIR=$WORKSPACE/output
-```
-
-Run the command below for training without data augmentation and hyperparameter tuning inside container:
-
-```sh
-cd $WORKSPACE/src
-python training.py -d $DATA_DIR -o $OUTPUT_DIR/pill_intel_model.h5
-```
-
-You can follow steps 1, 2 and 3 in the [Run Bare Metal](#run-using-bare-metal) section.
-
-### 7. Clean Up Docker Containers
-
-Stop containers created by docker compose and remove them.
-
-```bash
-docker compose down
 ```
 
 ## Expected Outputs
