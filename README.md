@@ -54,7 +54,7 @@ The solution contained in this repo uses the following Intel® packages:
 >
 >   The [Intel® Neural Compressor\*](https://github.com/intel/neural-compressor) aims to provide popular model compression techniques such as quantization, pruning (sparsity), distillation, and neural architecture search on mainstream frameworks such as TensorFlow, PyTorch, ONNX Runtime, and MXNet, as well as Intel extensions such as Intel Extension for TensorFlow and Intel Extension for PyTorch.
 
-For more details, visit [Quality Visual Inspection GitHub](https://github.com/intel-innersource/frameworks.ai.platform.sample-apps.visual-quality-inspection) repository.
+For more details, visit [Quality Visual Inspection GitHub](https://github.com/oneapi-src/visual-quality-inspection) repository.
 
 ## Solution Technical Details
 
@@ -136,7 +136,7 @@ Create a working directory for the workflow and clone the [Quality Visual Inspec
 
 ```
 mkdir -p $WORKSPACE && cd $WORKSPACE
-git clone https://github.com/intel-innersource/frameworks.ai.platform.sample-apps.visual-quality-inspection.git .
+git clone https://github.com/oneapi-src/visual-quality-inspection.git .
 ```
 
 ### Set up Miniconda
