@@ -1,1 +1,6 @@
 
+data/*
+output/*
+src/utils/__pycache__/*
+src/intel_neural_compressor/nc_workspace/*
+src/intel_neural_compressor/utils/*
