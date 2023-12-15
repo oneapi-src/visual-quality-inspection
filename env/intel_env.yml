@@ -8,3 +8,4 @@ dependencies:
   - scikit-learn-intelex=2024.0.0
   - seaborn=0.13.0
   - dataset_librarian=1.0.4
+  - tornado=6.3.2
