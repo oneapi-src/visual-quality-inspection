@@ -22,6 +22,7 @@ Check out more workflow examples and reference implementations in the [Developer
   - [Adopt to your dataset](#adopt-to-your-dataset)
 - [Learn More](#learn-more)
 - [Support](#support)
+- [Appendix](#appendix)
 
 ## Solution Technical Overview
 
@@ -162,33 +163,34 @@ git clone https://github.com/oneapi-src/visual-quality-inspection.git .
 To learn more about conda installation, see the [Conda Linux installation instructions](https://docs.conda.io/projects/conda/en/stable/user-guide/install/linux.html).
 
 ### Set Up Environment
+The conda yaml dependencies are kept in `$WORKSPACE/env/intel_env.yml`.
+
+| **Packages required in YAML file:**                 | **Version:**
+| :---                          | :--
+| `python`  | 3.9
+| `intel-aikit-pytorch`  | 2024.0
+| `scikit-learn-intelex`  | 2024.0.0
+| `seaborn`  | 0.13.0
+| `dataset_librarian`  | 1.0.4
+
+
+Follow the next steps to setup the conda environment:
 
 ```sh
-conda config --set solver libmamba
+conda config --set solver libmamba # If conda<2.10.0 
 conda env create -f $WORKSPACE/env/intel_env.yml --no-default-packages
 conda activate visual_inspection_intel
 ```
 
 Environment setup is required only once. This step does not cleanup the existing environment with the same name hence we need to make sure there is no conda environment exists with the same name. During this setup, `visual_inspection_intel` conda environment will be created with the dependencies listed in the YAML configuration.
 
-#### Known Limitations
-
-<a id="Known_Limitations"></a>
-
-[Intel® AI Analytics Toolkit Release Notes](https://www.intel.com/content/www/us/en/developer/articles/release-notes/oneapi-ai-analytics-toolkit-release-notes.html): 
-Utilizing Intel® Optimization for PyTorch* and Intel® Extension for PyTorch* on Intel® Xeon® Scalable Processors Familiy without GPU accelerator requires installing Intel® Extension for PyTorch with CPU support inside environment with the following command:
-
-```bash
-python -m pip install intel_extension_for_pytorch -f https://developer.intel.com/ipex-whl-stable-cpu torch==2.0.1
-```
-
 ### Download the Dataset
 
 > The pill dataset is downloaded and extracted in a folder before running the training python module.
 
-Download the mvtec dataset using Intel® Model Zoo Dataset Librarian (You can get the Dataset from [MVTec AD](https://www.mvtec.com/company/research/datasets/mvtec-ad) [[1]](#mvtec_ad_dataset)). We are going to use the **pill dataset**.
+Download the mvtec dataset using Intel® AI Reference Models Dataset Librarian (You can get the Dataset from [MVTec AD](https://www.mvtec.com/company/research/datasets/mvtec-ad) [[1]](#mvtec_ad_dataset)). We are going to use the **pill dataset**.
 
-More details of the Intel® Model Zoo Dataset Librarian can be found [here](https://github.com/IntelAI/models/tree/master/datasets/dataset_api) and, terms and conditions can be found [here](https://github.com/IntelAI/models/blob/master/datasets/dataset_api/src/dataset_librarian/terms_and_conditions.txt).
+More details of the Intel® AI Reference Models Dataset Librarian can be found [here](https://github.com/IntelAI/models/tree/master/datasets/dataset_api) and, terms and conditions can be found [here](https://github.com/IntelAI/models/blob/master/datasets/dataset_api/src/dataset_librarian/terms_and_conditions.txt).
 
 [//]: # (capture: baremetal)
 
@@ -200,7 +202,7 @@ Note: See this dataset's applicable license for terms and conditions. Intel Corp
 
 #### Dataset Preparation
 
-The dataset available from the source requires a filtering before the training. Assuming the pill dataset is downloaded with the Intel® Model Zoo Dataset Librarian or using from the dataset source given above in this document, follow the below steps to filter the dataset extracted from the source.
+The dataset available from the source requires a filtering before the training. Assuming the pill dataset is downloaded with the Intel® AI Reference Models Dataset Librarian or using from the dataset source given above in this document, follow the below steps to filter the dataset extracted from the source.
 
 [//]: # (capture: baremetal)
 
@@ -250,7 +252,7 @@ This reference kit offers one options for running the fine-tuning and inference 
 
 ## Run Using Bare Metal
 
-> **Note**: Follow these instructions to set up and run this workflow on your own development system.
+> **Note**: Follow these instructions to set up and run this workflow on your own development system. 
 
 ### Set Up and run Workflow
 
@@ -287,7 +289,7 @@ _You need to change directory to src folder_
 cd $WORKSPACE/src
 ```
 
-_Command to run training without data augmentation and hyperparameter tuning_
+_Command to run training without data augmentation nor hyperparameter tuning_
 
 [//]: # (capture: baremetal)
 
@@ -297,7 +299,7 @@ python training.py -d $DATA_DIR -o $OUTPUT_DIR/pill_intel_model.h5
 
 The model is saved in the OUTPUT_DIR as pill_intel.h5.
 
-_Command to run training with data augmentation and without hyperparameter tuning_
+_Command to run training with data augmentation_
 
 [//]: # (capture: baremetal)
 
@@ -353,7 +355,6 @@ _Command to run the real-time inference using Intel® PyTorch\*_
 
 ```sh
 python pytorch_evaluation.py -d $DATA_DIR -m $OUTPUT_DIR/{trained_model.h5} -b 1
-
 ```
 
 Using model from previous steps:
@@ -368,7 +369,7 @@ python pytorch_evaluation.py -d $DATA_DIR -m $OUTPUT_DIR/pill_intel_model.h5 -b 
 
 ### 3. Quantize trained models using Intel® Neural Compressor
 
-Intel® Neural Compressor is used to quantize the FP32 Model to the INT8 Model. Optimzied model is used here for evaluating and timing Analysis.
+Intel® Neural Compressor is used to quantize the FP32 Model to the INT8 Model. Optimized model is used here for evaluating and timing analysis.
 Intel® Neural Compressor supports many optimization methods. In this case, we used post training quantization with `Accuracy aware mode` method to quantize the FP32 model.
 
 _Step-1: Conversion of FP32 Model to INT8 Model_
